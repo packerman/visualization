@@ -7,8 +7,10 @@ import common.Pipeline
 import web.gl.WebGL2RenderingContext
 import web.gl.WebGL2RenderingContext.Companion.COLOR_BUFFER_BIT
 import web.gl.WebGL2RenderingContext.Companion.DEPTH_BUFFER_BIT
+import web.gl.WebGL2RenderingContext.Companion.LINE_LOOP
 import web.html.HTMLCanvasElement
 
+@Suppress("unused")
 object SimplePipelineExample : Initializer<Application> {
 
     override fun initialize(gl: WebGL2RenderingContext): Application {
@@ -32,6 +34,7 @@ object SimplePipelineExample : Initializer<Application> {
             ),
             mapOf(),
             arrayOf(0, 1, 2, 0, 2, 3),
+            LINE_LOOP,
             """
             #version 300 es
             precision mediump float;
@@ -44,6 +47,7 @@ object SimplePipelineExample : Initializer<Application> {
 
             void main(void) {
                 gl_Position = vec4(aVertexPosition, 1.0);
+                gl_PointSize = 10.0;
                 v_Color = aColor;
             }
             """.trimIndent(),

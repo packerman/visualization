@@ -2,6 +2,7 @@ package common
 
 import js.typedarrays.Float32Array
 import js.typedarrays.Uint16Array
+import web.gl.GLenum
 import web.gl.WebGL2RenderingContext
 import web.gl.WebGL2RenderingContext.Companion.ARRAY_BUFFER
 import web.gl.WebGL2RenderingContext.Companion.ELEMENT_ARRAY_BUFFER
@@ -40,6 +41,7 @@ class Pipeline(
     val attributes: Map<String, AttributeSupplier>,
     val uniforms: Map<String, Attribute>,
     val indices: Array<Short>,
+    val mode: GLenum,
     val vertexShaderSource: String,
     val fragmentShaderSource: String
 ) {
@@ -73,7 +75,7 @@ class Pipeline(
         gl.bindBuffer(ARRAY_BUFFER, null)
         gl.bindBuffer(ELEMENT_ARRAY_BUFFER, null)
 
-        return Renderable(vao, indices.size)
+        return Renderable(vao, indices.size, mode)
     }
 
     companion object {
@@ -93,11 +95,12 @@ class Pipeline(
 
 class Renderable(
     val vertexArray: WebGLVertexArrayObject,
-    val count: Int
+    val count: Int,
+    val mode: GLenum
 ) {
     fun render(gl: WebGL2RenderingContext) {
         gl.bindVertexArray(vertexArray)
-        gl.drawElements(WebGL2RenderingContext.TRIANGLES, count, WebGL2RenderingContext.UNSIGNED_SHORT, 0)
+        gl.drawElements(mode, count, WebGL2RenderingContext.UNSIGNED_SHORT, 0)
         gl.bindVertexArray(null)
     }
 }
