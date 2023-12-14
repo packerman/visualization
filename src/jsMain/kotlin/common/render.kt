@@ -2,16 +2,13 @@ package common
 
 import js.typedarrays.Float32Array
 import js.typedarrays.Uint16Array
-import web.gl.GLenum
-import web.gl.WebGL2RenderingContext
+import web.gl.*
 import web.gl.WebGL2RenderingContext.Companion.ARRAY_BUFFER
 import web.gl.WebGL2RenderingContext.Companion.ELEMENT_ARRAY_BUFFER
 import web.gl.WebGL2RenderingContext.Companion.FLOAT
 import web.gl.WebGL2RenderingContext.Companion.FLOAT_VEC2
 import web.gl.WebGL2RenderingContext.Companion.FLOAT_VEC3
 import web.gl.WebGL2RenderingContext.Companion.FLOAT_VEC4
-import web.gl.WebGLBuffer
-import web.gl.WebGLVertexArrayObject
 
 typealias AttributeSupplier = (WebGL2RenderingContext) -> Attribute
 
@@ -34,12 +31,44 @@ class Attribute(private val arrayBuffer: WebGLBuffer, private val length: Int) {
     }
 }
 
-class Uniform {
+interface Uniform {
+    fun set(gl: WebGL2RenderingContext, location: WebGLUniformLocation?)
+
+    companion object {
+        fun uniform(value: Vector3) = Vector3Uniform(value)
+
+        fun uniform(x: Float, y: Float, z: Float) = Vector3Uniform(x, y, z)
+
+        fun uniform(value: Matrix4) = Matrix4Uniform(value)
+    }
+}
+
+class Vector3Uniform(private val value: Vector3) : Uniform {
+    constructor(x: Float, y: Float, z: Float) : this(Vector3(x, y, z))
+
+    override fun set(gl: WebGL2RenderingContext, location: WebGLUniformLocation?) {
+        gl.uniform3f(location, value.x, value.y, value.z)
+    }
+}
+
+class Matrix4Uniform(private val value: Matrix4) : Uniform {
+
+    private val list = Float32List(16)
+
+    override fun set(gl: WebGL2RenderingContext, location: WebGLUniformLocation?) {
+        value.copyTo(list)
+        gl.uniformMatrix4fv(location, 0, list, 0, null)
+    }
+
+    companion object {
+        fun Matrix4.copyTo(list: Float32List, offset: Int = 0) =
+            forEachIndexed { i, f -> list[offset + i] = f }
+    }
 }
 
 class Pipeline(
     val attributes: Map<String, AttributeSupplier>,
-    val uniforms: Map<String, Attribute>,
+    val uniforms: Map<String, Uniform>,
     val indices: Array<Short>,
     val mode: GLenum,
     val vertexShaderSource: String,
@@ -49,14 +78,13 @@ class Pipeline(
     fun initialize(gl: WebGL2RenderingContext): Renderable {
         val vao = requireNotNull(gl.createVertexArray()) { "Cannot create VAO" }
 
-        val program = buildProgram(gl, vertexShaderSource, fragmentShaderSource)
-        gl.useProgram(program)
-        val activeAttributes = getActiveAttributes(gl, program)
+        val program = Program.build(gl, vertexShaderSource, fragmentShaderSource)
+        program.use(gl)
 
         gl.bindVertexArray(vao)
 
         for ((name, supplyAttribute) in attributes) {
-            val active = activeAttributes.getValue(name)
+            val active = program.attributes.getValue(name)
 
             supplyAttribute(gl)
 
@@ -65,11 +93,18 @@ class Pipeline(
 
             gl.vertexAttribPointer(active.location, size, type, 0, 0, 0)
             gl.enableVertexAttribArray(active.location)
+            console.log("Set attribute $name")
         }
 
         val indexBuffer = requireNotNull(gl.createBuffer()) { "Cannot create buffer" }
         gl.bindBuffer(ELEMENT_ARRAY_BUFFER, indexBuffer)
         gl.bufferData(ELEMENT_ARRAY_BUFFER, Uint16Array(indices), WebGL2RenderingContext.STATIC_DRAW)
+
+        for ((name, uniform) in uniforms) {
+            val active = program.uniforms.getValue(name)
+            uniform.set(gl, active.location)
+            console.log("Set uniform $name")
+        }
 
         gl.bindVertexArray(null)
         gl.bindBuffer(ARRAY_BUFFER, null)

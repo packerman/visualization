@@ -1,7 +1,6 @@
-import examples.SimplePipelineExample
-import examples.VaoExample
+import examples.GoraudLambertExample
 import web.dom.document
-import web.gl.*
+import web.gl.WebGL2RenderingContext
 import web.gl.WebGL2RenderingContext.Companion.COLOR_BUFFER_BIT
 import web.html.HTMLCanvasElement
 
@@ -14,7 +13,7 @@ fun main() {
     gl.clearColor(0.5, 0.5, 0.5, 1)
     gl.clear(COLOR_BUFFER_BIT)
 
-    val app = SimplePipelineExample.initialize(gl)
+    val app = GoraudLambertExample.initialize(gl)
 
     app.draw(gl)
 }

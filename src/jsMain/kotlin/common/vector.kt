@@ -24,3 +24,36 @@ data class Vector3(val x: Float, val y: Float, val z: Float) {
         x * other.y - y * other.x
     )
 }
+
+data class Matrix4 internal constructor(private val m: FloatArray) {
+
+    init {
+        require(m.size == 16)
+    }
+
+    constructor(vararg floats: Float) : this(floats)
+
+    fun forEachIndexed(action: (Int, Float) -> Unit) = m.forEachIndexed(action)
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || this::class.js != other::class.js) return false
+
+        other as Matrix4
+
+        return m.contentEquals(other.m)
+    }
+
+    override fun hashCode(): Int {
+        return m.contentHashCode()
+    }
+
+    companion object {
+        fun identity() = Matrix4(
+            1f, 0f, 0f, 0f,
+            0f, 1f, 0f, 0f,
+            0f, 0f, 1f, 0f,
+            0f, 0f, 0f, 1f
+        )
+    }
+}

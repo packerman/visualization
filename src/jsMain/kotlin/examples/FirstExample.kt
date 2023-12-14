@@ -1,7 +1,7 @@
 package examples
 
 import common.Application
-import common.buildProgram
+import common.Program
 import js.typedarrays.Float32Array
 import js.typedarrays.Uint16Array
 import web.gl.GLint
@@ -60,13 +60,12 @@ class FirstExample(
             gl.bindBuffer(WebGL2RenderingContext.ARRAY_BUFFER, null)
             gl.bindBuffer(WebGL2RenderingContext.ELEMENT_ARRAY_BUFFER, null)
 
-            val program = buildProgram(gl, vertexShaderSource, fragmentShaderSource)
-            gl.useProgram(program)
+            val program = Program.build(gl, vertexShaderSource, fragmentShaderSource)
+            program.use(gl)
 
-            val positionLocation = gl.getAttribLocation(program, "aVertexPosition")
-            check(positionLocation.toInt() >= 0) { "Unknown position location" }
+            val position = program.attributes.getValue("aVertexPosition")
 
-            return FirstExample(buffer, indexBuffer, positionLocation, indices.size)
+            return FirstExample(buffer, indexBuffer, position.location, indices.size)
         }
 
         private val vertexShaderSource = """

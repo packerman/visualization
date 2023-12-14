@@ -1,16 +1,18 @@
 package examples
 
 import common.Application
-import common.buildProgram
+import common.Program
 import js.typedarrays.Float32Array
 import js.typedarrays.Uint16Array
-import web.gl.*
+import web.gl.GLint
+import web.gl.WebGL2RenderingContext
 import web.gl.WebGL2RenderingContext.Companion.ARRAY_BUFFER
 import web.gl.WebGL2RenderingContext.Companion.COLOR_BUFFER_BIT
 import web.gl.WebGL2RenderingContext.Companion.DEPTH_BUFFER_BIT
 import web.gl.WebGL2RenderingContext.Companion.ELEMENT_ARRAY_BUFFER
 import web.gl.WebGL2RenderingContext.Companion.STATIC_DRAW
 import web.gl.WebGL2RenderingContext.Companion.TRIANGLES
+import web.gl.WebGLVertexArrayObject
 import web.html.HTMLCanvasElement
 
 @Suppress("unused")
@@ -51,20 +53,19 @@ class VaoExample(
             gl.bindBuffer(ELEMENT_ARRAY_BUFFER, indexBuffer)
             gl.bufferData(ELEMENT_ARRAY_BUFFER, Uint16Array(indices), STATIC_DRAW)
 
-            val program = buildProgram(gl, vertexShaderSource, fragmentShaderSource)
-            gl.useProgram(program)
+            val program = Program.build(gl, vertexShaderSource, fragmentShaderSource)
+            program.use(gl)
 
-            val positionLocation = gl.getAttribLocation(program, "aVertexPosition")
-            check(positionLocation.toInt() >= 0) { "Unknown position location" }
+            val position = program.attributes.getValue("aVertexPosition")
 
-            gl.vertexAttribPointer(positionLocation, 3, WebGL2RenderingContext.FLOAT, 0, 0, 0)
-            gl.enableVertexAttribArray(positionLocation)
+            gl.vertexAttribPointer(position.location, 3, WebGL2RenderingContext.FLOAT, 0, 0, 0)
+            gl.enableVertexAttribArray(position.location)
 
             gl.bindVertexArray(null)
             gl.bindBuffer(ARRAY_BUFFER, null)
             gl.bindBuffer(ELEMENT_ARRAY_BUFFER, null)
 
-            return VaoExample(vao, positionLocation, indices.size)
+            return VaoExample(vao, position.location, indices.size)
         }
 
         private val vertexShaderSource = """
