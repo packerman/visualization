@@ -9,7 +9,7 @@ repositories {
     mavenCentral()
 }
 
-val kotlinWrappersVersion = "1.0.0-pre.664"
+val kotlinWrappersVersion = "1.0.0-pre.666"
 
 kotlin {
     js {
