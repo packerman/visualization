@@ -4,7 +4,7 @@ import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
 
-open class ParametricSurface(
+class ParametricSurface(
     val uRange: ClosedFloatingPointRange<Float>,
     val uResolution: Int,
     val vRange: ClosedFloatingPointRange<Float>,
@@ -80,19 +80,26 @@ open class ParametricSurface(
     companion object {
         private const val H = 0.0001f
 
+        fun sphere(radius: Float = 1f, radiusSegments: Int = 32, heightSegments: Int = 16) =
+            ParametricSurface(
+                0f..2f * PI.toFloat(),
+                radiusSegments,
+                -PI.toFloat() / 2f..PI.toFloat() / 2f,
+                heightSegments
+            ) { u, v -> Vector3(radius * sin(u) * cos(v), radius * sin(v), radius * cos(u) * cos(v)) }
+
+        fun plane(
+            origin: Vector3, uEdge: Vector3, vEdge: Vector3,
+            uResolution: Int = 1, vResolution: Int = 1
+        ) =
+            ParametricSurface(
+                0f..1f,
+                uResolution,
+                0f..1f,
+                vResolution
+            ) { u, v -> origin + uEdge * u + vEdge * v }
+
         private fun getNormalTo(p0: Vector3, p1: Vector3, p2: Vector3): Vector3 =
             (p1 - p0).cross(p2 - p0).normalize()
     }
 }
-
-class Sphere(
-    private val radius: Float = 1f,
-    radiusSegments: Int = 32,
-    heightSegments: Int = 16
-) : ParametricSurface(
-    0f .. 2*PI.toFloat(),
-    radiusSegments,
-    -PI.toFloat() / 2f..PI.toFloat() / 2f,
-    heightSegments,
-    { u, v -> Vector3(radius * sin(u) * cos(v), radius * sin(v), radius * cos(u) * cos(v)) }
-)

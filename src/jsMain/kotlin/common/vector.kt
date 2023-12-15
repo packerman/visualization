@@ -4,10 +4,22 @@ import kotlin.math.sqrt
 
 data class Vector3(val x: Float, val y: Float, val z: Float) {
 
+    operator fun plus(other: Vector3): Vector3 = Vector3(
+        x + other.x,
+        y + other.y,
+        z + other.z
+    )
+
     operator fun minus(other: Vector3): Vector3 = Vector3(
         x - other.x,
         y - other.y,
         z - other.z
+    )
+
+    operator fun times(factor: Float): Vector3 = Vector3(
+        factor * x,
+        factor * y,
+        factor * z
     )
 
     val length: Float

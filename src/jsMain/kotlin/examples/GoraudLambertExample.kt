@@ -10,28 +10,33 @@ import web.html.HTMLCanvasElement
 object GoraudLambertExample : Initializer<Application> {
     override fun initialize(gl: WebGL2RenderingContext): Application {
 
-        val sphere = Sphere(
-            radius = 0.9f
+        val surface = ParametricSurface.sphere(
+            radius = 0.9f,
+            radiusSegments = 40,
+            heightSegments = 40
         )
 
-        console.log("Position count: " + sphere.positions.size)
-        console.log("Position normals: " + sphere.normals.size)
-        console.log("Indices: " + sphere.indices.size)
+//        val surface = ParametricSurface.plane(
+//            Vector3(-0.5f, -0.5f, 0f),
+//            Vector3(1f, 0f, 0f),
+//            Vector3(0f, 1f, 0f),
+//            10, 10
+//        )
 
         val pipeline = Pipeline(
             mapOf(
-                "a_position" to attribute(sphere.positions),
-                "a_normal" to attribute(sphere.normals)
+                "a_position" to attribute(surface.positions),
+                "a_normal" to attribute(surface.normals)
             ),
             mapOf(
-                "u_LightDirection" to uniform(0f, -1f, -1f),
+                "u_LightDirection" to uniform(0f, -1f, 1f),
                 "u_LightDiffuse" to uniform(1f, 1f, 1f),
                 "u_MaterialDiffuse" to uniform(0.5f, 0.8f, 0.1f),
                 "u_ModelViewMatrix" to uniform(Matrix4.identity()),
                 "u_ProjectionMatrix" to uniform(Matrix4.identity()),
                 "u_NormalMatrix" to uniform(Matrix4.identity()),
             ),
-            sphere.indices,
+            surface.indices,
             TRIANGLES,
             vertexShaderSource,
             fragmentShaderSource
