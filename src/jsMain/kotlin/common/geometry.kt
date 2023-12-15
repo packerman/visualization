@@ -60,8 +60,8 @@ open class ParametricSurface(
                 for (uIndex in 0..<uResolution) {
                     for (vIndex in 0..<vResolution) {
                         val i = getOffset(uIndex, vIndex)
-                        val j = getOffset(uIndex, vIndex + 1)
-                        val k = getOffset(uIndex + 1, vIndex)
+                        val j = getOffset(uIndex + 1, vIndex)
+                        val k = getOffset(uIndex, vIndex + 1)
                         val l = getOffset(uIndex + 1, vIndex + 1)
                         add(i.toShort())
                         add(j.toShort())
@@ -75,7 +75,7 @@ open class ParametricSurface(
             return result.toTypedArray()
         }
 
-    private fun getOffset(uIndex: Int, vIndex: Int): Int = uIndex + vIndex * (uResolution + 1)
+    private fun getOffset(uIndex: Int, vIndex: Int): Int = uIndex * (vResolution + 1) + vIndex
 
     companion object {
         private const val H = 0.0001f
@@ -90,7 +90,7 @@ class Sphere(
     radiusSegments: Int = 32,
     heightSegments: Int = 16
 ) : ParametricSurface(
-    0f..2 * PI.toFloat(),
+    0f .. 2*PI.toFloat(),
     radiusSegments,
     -PI.toFloat() / 2f..PI.toFloat() / 2f,
     heightSegments,

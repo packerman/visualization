@@ -93,7 +93,6 @@ class Pipeline(
 
             gl.vertexAttribPointer(active.location, size, type, 0, 0, 0)
             gl.enableVertexAttribArray(active.location)
-            console.log("Set attribute $name")
         }
 
         val indexBuffer = requireNotNull(gl.createBuffer()) { "Cannot create buffer" }
@@ -103,7 +102,6 @@ class Pipeline(
         for ((name, uniform) in uniforms) {
             val active = program.uniforms.getValue(name)
             uniform.set(gl, active.location)
-            console.log("Set uniform $name")
         }
 
         gl.bindVertexArray(null)
