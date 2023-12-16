@@ -12,6 +12,8 @@ repositories {
 val kotlinWrappersVersion = "1.0.0-pre.666"
 
 kotlin {
+    jvm {
+    }
     js {
         browser {
         }

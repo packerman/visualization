@@ -1,3 +1,5 @@
+import common.requestAnimationLoop
+import common.resizeCanvasToDisplaySize
 import examples.GoraudLambertExample
 import web.dom.document
 import web.gl.WebGL2RenderingContext
@@ -14,5 +16,8 @@ fun main() {
 
     val app = GoraudLambertExample.initialize(gl)
 
-    app.draw(gl)
+    requestAnimationLoop {
+        resizeCanvasToDisplaySize(gl)
+        app.draw(gl)
+    }
 }

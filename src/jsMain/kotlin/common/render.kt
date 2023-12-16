@@ -32,7 +32,7 @@ class Attribute(private val arrayBuffer: WebGLBuffer, private val length: Int) {
 }
 
 interface Uniform {
-    fun set(gl: WebGL2RenderingContext, location: WebGLUniformLocation?)
+    fun update(gl: WebGL2RenderingContext, location: WebGLUniformLocation?)
 
     companion object {
         fun uniform(value: Vector3) = Vector3Uniform(value)
@@ -46,7 +46,7 @@ interface Uniform {
 class Vector3Uniform(private val value: Vector3) : Uniform {
     constructor(x: Float, y: Float, z: Float) : this(Vector3(x, y, z))
 
-    override fun set(gl: WebGL2RenderingContext, location: WebGLUniformLocation?) {
+    override fun update(gl: WebGL2RenderingContext, location: WebGLUniformLocation?) {
         gl.uniform3f(location, value.x, value.y, value.z)
     }
 }
@@ -55,7 +55,7 @@ class Matrix4Uniform(private val value: Matrix4) : Uniform {
 
     private val list = Float32List(16)
 
-    override fun set(gl: WebGL2RenderingContext, location: WebGLUniformLocation?) {
+    override fun update(gl: WebGL2RenderingContext, location: WebGLUniformLocation?) {
         value.copyTo(list)
         gl.uniformMatrix4fv(location, 0, list, 0, null)
     }
@@ -99,16 +99,15 @@ class Pipeline(
         gl.bindBuffer(ELEMENT_ARRAY_BUFFER, indexBuffer)
         gl.bufferData(ELEMENT_ARRAY_BUFFER, Uint16Array(indices), WebGL2RenderingContext.STATIC_DRAW)
 
-        for ((name, uniform) in uniforms) {
-            val active = program.uniforms.getValue(name)
-            uniform.set(gl, active.location)
-        }
+        val activeUniforms = uniforms.asSequence()
+            .map { (name, uniform) -> uniform to program.uniforms.getValue(name) }
+            .toList()
 
         gl.bindVertexArray(null)
         gl.bindBuffer(ARRAY_BUFFER, null)
         gl.bindBuffer(ELEMENT_ARRAY_BUFFER, null)
 
-        return Renderable(vao, indices.size, mode)
+        return Renderable(program, vao, indices.size, mode, activeUniforms)
     }
 
     companion object {
@@ -127,11 +126,19 @@ class Pipeline(
 }
 
 class Renderable(
+    val program: Program,
     val vertexArray: WebGLVertexArrayObject,
     val count: Int,
-    val mode: GLenum
+    val mode: GLenum,
+    val uniforms: List<Pair<Uniform, ActiveUniform>>
 ) {
     fun render(gl: WebGL2RenderingContext) {
+        program.use(gl)
+
+        for ((uniform, active) in uniforms) {
+            uniform.update(gl, active.location)
+        }
+
         gl.bindVertexArray(vertexArray)
         gl.drawElements(mode, count, WebGL2RenderingContext.UNSIGNED_SHORT, 0)
         gl.bindVertexArray(null)

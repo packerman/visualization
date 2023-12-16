@@ -11,17 +11,14 @@ object GoraudLambertExample : Initializer<Application> {
     override fun initialize(gl: WebGL2RenderingContext): Application {
 
         val surface = ParametricSurface.sphere(
-            radius = 0.9f,
+            radius = 0.5f,
             radiusSegments = 40,
             heightSegments = 40
         )
 
-//        val surface = ParametricSurface.plane(
-//            Vector3(-0.5f, -0.5f, 0f),
-//            Vector3(1f, 0f, 0f),
-//            Vector3(0f, 1f, 0f),
-//            10, 10
-//        )
+        val projectionMatrix = Matrix4()
+        val modelViewMatrix = Matrix4()
+        val normalMatrix = Matrix4()
 
         val pipeline = Pipeline(
             mapOf(
@@ -29,12 +26,12 @@ object GoraudLambertExample : Initializer<Application> {
                 "a_normal" to attribute(surface.normals)
             ),
             mapOf(
-                "u_LightDirection" to uniform(0f, -1f, 1f),
+                "u_LightDirection" to uniform(0f, -1f, -1f),
                 "u_LightDiffuse" to uniform(1f, 1f, 1f),
                 "u_MaterialDiffuse" to uniform(0.5f, 0.8f, 0.1f),
-                "u_ModelViewMatrix" to uniform(Matrix4.identity()),
-                "u_ProjectionMatrix" to uniform(Matrix4.identity()),
-                "u_NormalMatrix" to uniform(Matrix4.identity()),
+                "u_ModelViewMatrix" to uniform(modelViewMatrix),
+                "u_ProjectionMatrix" to uniform(projectionMatrix),
+                "u_NormalMatrix" to uniform(normalMatrix),
             ),
             surface.indices,
             TRIANGLES,
@@ -46,8 +43,22 @@ object GoraudLambertExample : Initializer<Application> {
 
         return object : Application {
             override fun draw(gl: WebGL2RenderingContext) {
+                val canvas = gl.canvas as HTMLCanvasElement
                 gl.clear(WebGL2RenderingContext.COLOR_BUFFER_BIT.toInt() or WebGL2RenderingContext.DEPTH_BUFFER_BIT.toInt())
-                gl.viewport(0, 0, (gl.canvas as HTMLCanvasElement).width, (gl.canvas as HTMLCanvasElement).height)
+                gl.viewport(0, 0, canvas.width, canvas.height)
+
+                projectionMatrix.perspective(
+                    toRadians(45f),
+                    aspect(canvas.clientWidth, canvas.clientHeight),
+                    0.1f,
+                    1000f
+                )
+                modelViewMatrix.identity()
+                    .translate(Vector3(0f, 0f, -1.5f))
+
+                modelViewMatrix.copyTo(normalMatrix)
+                    .invert()
+                    ?.transpose()
 
                 renderable.render(gl)
             }
