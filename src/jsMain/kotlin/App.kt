@@ -1,6 +1,5 @@
-import common.requestAnimationLoop
-import common.resizeCanvasToDisplaySize
-import examples.GoraudLambertExample
+import common.run
+import examples.MovingLightExample
 import web.dom.document
 import web.gl.WebGL2RenderingContext
 import web.html.HTMLCanvasElement
@@ -14,10 +13,7 @@ fun main() {
     gl.clearColor(0.5, 0.5, 0.5, 1)
     gl.enable(WebGL2RenderingContext.DEPTH_TEST)
 
-    val app = GoraudLambertExample.initialize(gl)
+    val app = MovingLightExample.initialize(gl)
 
-    requestAnimationLoop {
-        resizeCanvasToDisplaySize(gl)
-        app.draw(gl)
-    }
+    run(gl, app)
 }

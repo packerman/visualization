@@ -7,7 +7,7 @@ import web.gl.WebGL2RenderingContext
 import web.gl.WebGL2RenderingContext.Companion.TRIANGLES
 import web.html.HTMLCanvasElement
 
-object GoraudLambertExample : Initializer<Application> {
+object MovingLightExample : Initializer<Application> {
     override fun initialize(gl: WebGL2RenderingContext): Application {
 
         val surface = ParametricSurface.sphere(
@@ -53,6 +53,12 @@ object GoraudLambertExample : Initializer<Application> {
         val renderable = pipeline.initialize(gl)
 
         return object : Application {
+            var angle = 0f
+
+            override fun update(elapsed: Double) {
+                angle += (90 * elapsed).toFloat() / 1000f
+            }
+
             override fun render(gl: WebGL2RenderingContext) {
                 val canvas = gl.canvas as HTMLCanvasElement
                 gl.clear(WebGL2RenderingContext.COLOR_BUFFER_BIT.toInt() or WebGL2RenderingContext.DEPTH_BUFFER_BIT.toInt())
@@ -66,6 +72,7 @@ object GoraudLambertExample : Initializer<Application> {
                 )
                 modelViewMatrix.identity()
                     .translate(Vector3(0f, 0f, -1.5f))
+                    .rotate(toRadians(angle), Vector3(0f, 1f, 0f))
 
                 modelViewMatrix.copyTo(normalMatrix)
                     .invert()
@@ -94,7 +101,7 @@ object GoraudLambertExample : Initializer<Application> {
 
     void main(void) {
       vec3 normal = normalize(vec3(u_NormalMatrix * vec4(a_normal, 1.0)));
-      vec3 light = normalize(u_LightDirection);
+      vec3 light = normalize(vec3(u_ModelViewMatrix * vec4(u_LightDirection, 0.0)));
       float lambertTerm = dot(normal, -light);
       vec3 diffuse = u_MaterialDiffuse * u_LightDiffuse * lambertTerm;
       v_Color = vec4(diffuse, 1.0);

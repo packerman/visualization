@@ -35,8 +35,7 @@ class GUIBuilder(name: String, width: Number) {
     fun vector(
         name: String,
         value: Vector3,
-        min: Float,
-        max: Float,
+        range: ClosedFloatingPointRange<Float>,
         step: Float,
         onChange: (Vector3) -> Unit
     ) {
@@ -51,20 +50,19 @@ class GUIBuilder(name: String, width: Number) {
                 state[nameZ] as Float,
             ))
         }
-        add(state, nameX, value.x, min, max, step, callback)
-        add(state, nameY, value.y, min, max, step, callback)
-        add(state, nameZ, value.z, min, max, step, callback)
+        add(state, nameX, value.x, range, step, callback)
+        add(state, nameY, value.y, range, step, callback)
+        add(state, nameZ, value.z, range, step, callback)
     }
 
     private fun add(state: dynamic,
                     name: String,
                     value: Float,
-                    min: Float,
-                    max: Float,
+                    range: ClosedFloatingPointRange<Float>,
                     step: Float,
                     onChange: (dynamic, Float) -> Unit) {
         state[name] = value
-        val controller = gui.add(state, name, min, max, step)
+        val controller = gui.add(state, name, range.start, range.endInclusive, step)
         controller.onChange { onChange(state, it.toFloat()) }
     }
 

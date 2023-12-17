@@ -16,7 +16,7 @@ class FirstExample(
     private val positionLocation: GLint,
     private val count: Int
 ): Application {
-    override fun draw(gl: WebGL2RenderingContext) {
+    override fun render(gl: WebGL2RenderingContext) {
         gl.clear(WebGL2RenderingContext.COLOR_BUFFER_BIT.toInt() or WebGL2RenderingContext.DEPTH_BUFFER_BIT.toInt())
         gl.viewport(0, 0, (gl.canvas as HTMLCanvasElement).width, (gl.canvas as HTMLCanvasElement).height)
 

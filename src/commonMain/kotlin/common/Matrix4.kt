@@ -43,6 +43,10 @@ data class Matrix4 internal constructor(val a: FloatArray) {
 
     fun translate(v: Vector3) = translate(this,  v)
 
+    fun rotate(out: Matrix4, rad: Float, axis: Vector3) = rotate(out, this, rad, axis)
+
+    fun rotate(rad: Float, axis: Vector3) = rotate(this, rad, axis)
+
     fun invert(out: Matrix4) = invert(out, this)
 
     fun invert() = invert(this)
