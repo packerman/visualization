@@ -1,5 +1,6 @@
 package common
 
+import js.core.toTypedArray
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
@@ -102,4 +103,28 @@ class ParametricSurface(
         private fun getNormalTo(p0: Vector3, p1: Vector3, p2: Vector3): Vector3 =
             (p1 - p0).cross(p2 - p0).normalize()
     }
+}
+
+fun calculateNormals(vertices: Array<Float>, indices: Array<Short>): Array<Float> {
+    fun x(i: Int) = vertices[3 * indices[i]]
+    fun y(i: Int) = vertices[3 * indices[i] + 1]
+    fun z(i: Int) = vertices[3 * indices[i] + 2]
+    fun index(i: Int) = indices[i].toInt()
+
+    val normals = Array(vertices.size) { Vector3(0f, 0f, 0f) }
+
+    for (i in indices.indices step 3) {
+        val v1 = Vector3(x(i + 2) - x(i + 1), y(i + 2) - y(i + 1), z(i + 2) - z(i + 1))
+        val v2 = Vector3(x(i) - x(i + 1), y(i) - y(i + 1), z(i) - z(i + 1))
+        val normal = v1 cross v2
+
+        for (j in 0..2) {
+            normals[index(i + j)] = normals[index(i + j)] + normal
+        }
+    }
+
+    return normals.asSequence()
+        .map(Vector3::normalize)
+        .flatMap { sequenceOf(it.x, it.y, it.z) }
+        .toTypedArray()
 }

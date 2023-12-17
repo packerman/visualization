@@ -7,6 +7,7 @@ import web.gl.WebGL2RenderingContext
 import web.gl.WebGL2RenderingContext.Companion.TRIANGLES
 import web.html.HTMLCanvasElement
 
+@Suppress("unused")
 object SpherePhongExample : Initializer<Application> {
     override fun initialize(gl: WebGL2RenderingContext): Application {
 
@@ -88,7 +89,7 @@ object SpherePhongExample : Initializer<Application> {
         return object : Application {
             var angle = 0f
 
-            override fun update(elapsed: Double) {
+            override fun update(elapsed: Double, keyState: KeyState) {
                 angle += (90 * elapsed).toFloat() / 1000f
             }
 
