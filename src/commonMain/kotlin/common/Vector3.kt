@@ -2,7 +2,28 @@ package common
 
 import kotlin.math.sqrt
 
-data class Vector3(val x: Float, val y: Float, val z: Float) {
+data class Vector3(private var _x: Float, private var _y: Float, private var _z: Float) {
+
+    val x: Float
+        get() = _x
+
+    val y: Float
+        get() = _y
+
+    val z: Float
+        get() = _z
+
+    fun copyTo(other: Vector3) {
+        other._x = x
+        other._y = y
+        other._z = z
+    }
+
+    fun set(x: Float, y: Float, z: Float) {
+        _x = x
+        _y = y
+        _z = z
+    }
 
     operator fun plus(other: Vector3): Vector3 = Vector3(
         x + other.x,
@@ -20,6 +41,12 @@ data class Vector3(val x: Float, val y: Float, val z: Float) {
         factor * x,
         factor * y,
         factor * z
+    )
+
+    operator fun div(factor: Float): Vector3 = Vector3(
+        x / factor,
+        y / factor,
+        z / factor
     )
 
     val length: Float

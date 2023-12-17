@@ -20,15 +20,18 @@ object GoraudLambertExample : Initializer<Application> {
         val modelViewMatrix = Matrix4()
         val normalMatrix = Matrix4()
 
+        val lightDirection = Vector3(0f, -1f, -1f)
+        val lightDiffuse = Vector3(1f, 1f, 1f)
+        val materialDiffuse = Vector3(0.5f, 0.8f, 0.1f)
         val pipeline = Pipeline(
             mapOf(
                 "a_position" to attribute(surface.positions),
                 "a_normal" to attribute(surface.normals)
             ),
             mapOf(
-                "u_LightDirection" to uniform(0f, -1f, -1f),
-                "u_LightDiffuse" to uniform(1f, 1f, 1f),
-                "u_MaterialDiffuse" to uniform(0.5f, 0.8f, 0.1f),
+                "u_LightDirection" to uniform(lightDirection),
+                "u_LightDiffuse" to uniform(lightDiffuse),
+                "u_MaterialDiffuse" to uniform(materialDiffuse),
                 "u_ModelViewMatrix" to uniform(modelViewMatrix),
                 "u_ProjectionMatrix" to uniform(projectionMatrix),
                 "u_NormalMatrix" to uniform(normalMatrix),
@@ -38,6 +41,14 @@ object GoraudLambertExample : Initializer<Application> {
             vertexShaderSource,
             fragmentShaderSource
         )
+
+        gui("My Gui", 430) {
+            color("Sphere Color", materialDiffuse) { it.copyTo(materialDiffuse) }
+            color("Light Diffuse Color", lightDiffuse) { it.copyTo(lightDiffuse) }
+            vector("Translate", lightDirection, -10f, 10f, -0.1f) {
+                lightDirection.set(-it.x, -it.y, it.z)
+            }
+        }
 
         val renderable = pipeline.initialize(gl)
 

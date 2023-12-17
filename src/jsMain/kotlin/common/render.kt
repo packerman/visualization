@@ -37,14 +37,11 @@ interface Uniform {
     companion object {
         fun uniform(value: Vector3) = Vector3Uniform(value)
 
-        fun uniform(x: Float, y: Float, z: Float) = Vector3Uniform(x, y, z)
-
         fun uniform(value: Matrix4) = Matrix4Uniform(value)
     }
 }
 
 class Vector3Uniform(private val value: Vector3) : Uniform {
-    constructor(x: Float, y: Float, z: Float) : this(Vector3(x, y, z))
 
     override fun update(gl: WebGL2RenderingContext, location: WebGLUniformLocation?) {
         gl.uniform3f(location, value.x, value.y, value.z)

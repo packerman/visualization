@@ -24,6 +24,7 @@ kotlin {
             dependencies {
                 implementation(project.dependencies.platform("org.jetbrains.kotlin-wrappers:kotlin-wrappers-bom:$kotlinWrappersVersion"))
                 implementation("org.jetbrains.kotlin-wrappers:kotlin-browser")
+                implementation(npm("dat.gui", "0.7.9"))
             }
         }
     }
