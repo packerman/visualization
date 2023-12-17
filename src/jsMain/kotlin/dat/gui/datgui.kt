@@ -18,7 +18,7 @@ external class dat {
     }
 
     class Controller {
-        fun onChange(fnc: (dynamic) -> Unit)
+        fun <V> onChange(fnc: (V) -> Unit)
     }
 }
 
