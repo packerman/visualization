@@ -24,7 +24,7 @@ class GUIBuilder(name: String, width: Number) {
         val state: dynamic = jso()
         state[name] = arrayOf(value.x * 255f, value.y * 255f, value.z * 255f)
         val controller = gui.addColor(state, name)
-        controller.onChange<Array<Number>> {
+        controller.onChange {
             val x = it[0].toFloat() / 255f
             val y = it[1].toFloat() / 255f
             val z = it[2].toFloat() / 255f
@@ -65,7 +65,7 @@ class GUIBuilder(name: String, width: Number) {
                     onChange: (dynamic, Float) -> Unit) {
         state[name] = value
         val controller = gui.add(state, name, min, max, step)
-        controller.onChange<Float> { onChange(state, it) }
+        controller.onChange { onChange(state, it.toFloat()) }
     }
 
     fun build(): GUI = gui
