@@ -2,6 +2,10 @@ import common.run
 import examples.WallExample
 import web.dom.document
 import web.gl.WebGL2RenderingContext
+import web.gl.WebGL2RenderingContext.Companion.RENDERER
+import web.gl.WebGL2RenderingContext.Companion.SHADING_LANGUAGE_VERSION
+import web.gl.WebGL2RenderingContext.Companion.VENDOR
+import web.gl.WebGL2RenderingContext.Companion.VERSION
 import web.html.HTMLCanvasElement
 
 fun main() {
@@ -15,5 +19,14 @@ fun main() {
 
     val app = WallExample.initialize(gl)
 
+    logWebGLParameters(gl)
+
     run(gl, app)
+}
+
+private fun logWebGLParameters(gl: WebGL2RenderingContext) {
+    console.log(gl.getParameter(VERSION))
+    console.log(gl.getParameter(SHADING_LANGUAGE_VERSION))
+    console.log(gl.getParameter(VENDOR))
+    console.log(gl.getParameter(RENDERER))
 }
