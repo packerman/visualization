@@ -35,9 +35,20 @@ interface Uniform {
     fun update(gl: WebGL2RenderingContext, location: WebGLUniformLocation?)
 
     companion object {
+        fun uniform(value: Vector1) = Vector1Uniform(value)
+
         fun uniform(value: Vector3) = Vector3Uniform(value)
 
+        fun uniform(value: Vector4) = Vector4Uniform(value)
+
         fun uniform(value: Matrix4) = Matrix4Uniform(value)
+    }
+}
+
+class Vector1Uniform(private val value: Vector1) : Uniform {
+
+    override fun update(gl: WebGL2RenderingContext, location: WebGLUniformLocation?) {
+        gl.uniform1f(location, value.x)
     }
 }
 
@@ -45,6 +56,13 @@ class Vector3Uniform(private val value: Vector3) : Uniform {
 
     override fun update(gl: WebGL2RenderingContext, location: WebGLUniformLocation?) {
         gl.uniform3f(location, value.x, value.y, value.z)
+    }
+}
+
+class Vector4Uniform(private val value: Vector4) : Uniform {
+
+    override fun update(gl: WebGL2RenderingContext, location: WebGLUniformLocation?) {
+        gl.uniform4f(location, value.x, value.y, value.z, value.w)
     }
 }
 
