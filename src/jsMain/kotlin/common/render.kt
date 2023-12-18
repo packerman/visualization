@@ -2,13 +2,16 @@ package common
 
 import js.typedarrays.Float32Array
 import js.typedarrays.Uint16Array
-import web.gl.*
+import web.gl.GLenum
+import web.gl.WebGL2RenderingContext
 import web.gl.WebGL2RenderingContext.Companion.ARRAY_BUFFER
 import web.gl.WebGL2RenderingContext.Companion.ELEMENT_ARRAY_BUFFER
 import web.gl.WebGL2RenderingContext.Companion.FLOAT
 import web.gl.WebGL2RenderingContext.Companion.FLOAT_VEC2
 import web.gl.WebGL2RenderingContext.Companion.FLOAT_VEC3
 import web.gl.WebGL2RenderingContext.Companion.FLOAT_VEC4
+import web.gl.WebGLBuffer
+import web.gl.WebGLVertexArrayObject
 
 typealias AttributeSupplier = (WebGL2RenderingContext) -> Attribute
 
@@ -31,59 +34,9 @@ class Attribute(private val arrayBuffer: WebGLBuffer, private val length: Int) {
     }
 }
 
-interface Uniform {
-    fun update(gl: WebGL2RenderingContext, location: WebGLUniformLocation?)
-
-    companion object {
-        fun uniform(value: Vector1) = Vector1Uniform(value)
-
-        fun uniform(value: Vector3) = Vector3Uniform(value)
-
-        fun uniform(value: Vector4) = Vector4Uniform(value)
-
-        fun uniform(value: Matrix4) = Matrix4Uniform(value)
-    }
-}
-
-class Vector1Uniform(private val value: Vector1) : Uniform {
-
-    override fun update(gl: WebGL2RenderingContext, location: WebGLUniformLocation?) {
-        gl.uniform1f(location, value.x)
-    }
-}
-
-class Vector3Uniform(private val value: Vector3) : Uniform {
-
-    override fun update(gl: WebGL2RenderingContext, location: WebGLUniformLocation?) {
-        gl.uniform3f(location, value.x, value.y, value.z)
-    }
-}
-
-class Vector4Uniform(private val value: Vector4) : Uniform {
-
-    override fun update(gl: WebGL2RenderingContext, location: WebGLUniformLocation?) {
-        gl.uniform4f(location, value.x, value.y, value.z, value.w)
-    }
-}
-
-class Matrix4Uniform(private val value: Matrix4) : Uniform {
-
-    private val list = Float32List(16)
-
-    override fun update(gl: WebGL2RenderingContext, location: WebGLUniformLocation?) {
-        value.copyTo(list)
-        gl.uniformMatrix4fv(location, 0, list, 0, null)
-    }
-
-    companion object {
-        fun Matrix4.copyTo(list: Float32List, offset: Int = 0) =
-            forEachIndexed { i, f -> list[offset + i] = f }
-    }
-}
-
 class Pipeline(
     val attributes: Map<String, AttributeSupplier>,
-    val uniforms: Map<String, Uniform>,
+    val uniforms: UniformMap,
     val indices: Array<Short>,
     val mode: GLenum,
     val vertexShaderSource: String,
@@ -145,7 +98,7 @@ class Renderable(
     val vertexArray: WebGLVertexArrayObject,
     val count: Int,
     val mode: GLenum,
-    val uniforms: List<Pair<Uniform, ActiveUniform>>
+    val uniforms: List<Pair<Uniform<*>, ActiveUniform>>
 ) {
     fun render(gl: WebGL2RenderingContext) {
         program.use(gl)

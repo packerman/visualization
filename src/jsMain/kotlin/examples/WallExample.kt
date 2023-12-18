@@ -2,7 +2,6 @@ package examples
 
 import common.*
 import common.Attribute.Companion.attribute
-import common.Uniform.Companion.uniform
 import web.gl.WebGL2RenderingContext
 import web.gl.WebGL2RenderingContext.Companion.TRIANGLES
 import web.html.HTMLCanvasElement
@@ -33,33 +32,24 @@ object WallExample : Initializer<Application> {
         )
         val normals = calculateNormals(positions, indices)
 
-        val projectionMatrix = Matrix4()
-        val modelViewMatrix = Matrix4()
-        val normalMatrix = Matrix4()
-
-        val lightDirection = Vector3(0f, 0f, -1f)
-        val lightAmbient = Vector4(0.01f, 0.01f, 0.01f, 1f)
-        val lightDiffuse = Vector4(0.5f, 0.5f, 0.5f, 1f)
-
-        val materialDiffuse = Vector4(0.1f, 0.5f, 0.8f, 1f)
-
         val clearColor = Vector4(0.9f, 0.9f, 0.9f, 1f)
         gl.clearColor(clearColor.x, clearColor.y, clearColor.z, clearColor.w)
 
+        val uniforms = uniformMap {
+            +("u_LightDirection" to Vector3(0f, 0f, -1f))
+            +("u_LightAmbient" to Vector4(0.01f, 0.01f, 0.01f, 1f))
+            +("u_LightDiffuse" to Vector4(0.5f, 0.5f, 0.5f, 1f))
+            +("u_MaterialDiffuse" to Vector4(0.1f, 0.5f, 0.8f, 1f))
+            +("u_ModelViewMatrix" to Matrix4())
+            +("u_ProjectionMatrix" to Matrix4())
+            +("u_NormalMatrix" to Matrix4())
+        }
         val pipeline = Pipeline(
             mapOf(
                 "a_position" to attribute(positions),
                 "a_normal" to attribute(normals)
             ),
-            mapOf(
-                "u_LightDirection" to uniform(lightDirection),
-                "u_LightAmbient" to uniform(lightAmbient),
-                "u_LightDiffuse" to uniform(lightDiffuse),
-                "u_MaterialDiffuse" to uniform(materialDiffuse),
-                "u_ModelViewMatrix" to uniform(modelViewMatrix),
-                "u_ProjectionMatrix" to uniform(projectionMatrix),
-                "u_NormalMatrix" to uniform(normalMatrix),
-            ),
+            uniforms,
             indices,
             TRIANGLES,
             vertexShaderSource,
@@ -90,7 +80,7 @@ object WallExample : Initializer<Application> {
                 elevation %= 360f
                 val theta = toRadians(elevation)
                 val phi = toRadians(azimuth)
-                lightDirection.set(
+                uniforms.get<Vector3>("u_LightDirection").set(
                     cos(theta) * sin(phi),
                     sin(theta),
                     cos(theta) * -cos(phi)
@@ -102,16 +92,16 @@ object WallExample : Initializer<Application> {
                 gl.clear(WebGL2RenderingContext.COLOR_BUFFER_BIT.toInt() or WebGL2RenderingContext.DEPTH_BUFFER_BIT.toInt())
                 gl.viewport(0, 0, canvas.width, canvas.height)
 
-                projectionMatrix.perspective(
+                uniforms.get<Matrix4>("u_ProjectionMatrix").perspective(
                     toRadians(45f),
                     aspect(canvas.clientWidth, canvas.clientHeight),
                     0.1f,
                     10000f
                 )
-                modelViewMatrix.identity()
+                uniforms.get<Matrix4>("u_ModelViewMatrix").identity()
                     .translate(Vector3(0f, 0f, -40f))
 
-                modelViewMatrix.copyTo(normalMatrix)
+                uniforms.get<Matrix4>("u_ModelViewMatrix").copyTo(uniforms["u_NormalMatrix"])
                     .invert()
                     ?.transpose()
 

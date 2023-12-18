@@ -2,7 +2,6 @@ package examples
 
 import common.*
 import common.Attribute.Companion.attribute
-import common.Uniform.Companion.uniform
 import web.gl.WebGL2RenderingContext
 import web.gl.WebGL2RenderingContext.Companion.TRIANGLES
 import web.html.HTMLCanvasElement
@@ -28,14 +27,14 @@ object GoraudLambertExample : Initializer<Application> {
                 "a_position" to attribute(surface.positions),
                 "a_normal" to attribute(surface.normals)
             ),
-            mapOf(
-                "u_LightDirection" to uniform(lightDirection),
-                "u_LightDiffuse" to uniform(lightDiffuse),
-                "u_MaterialDiffuse" to uniform(materialDiffuse),
-                "u_ModelViewMatrix" to uniform(modelViewMatrix),
-                "u_ProjectionMatrix" to uniform(projectionMatrix),
-                "u_NormalMatrix" to uniform(normalMatrix),
-            ),
+            uniformMap {
+                +("u_LightDirection" to lightDirection)
+                +("u_LightDiffuse" to lightDiffuse)
+                +("u_MaterialDiffuse" to materialDiffuse)
+                +("u_ModelViewMatrix" to modelViewMatrix)
+                +("u_ProjectionMatrix" to projectionMatrix)
+                +("u_NormalMatrix" to normalMatrix)
+            },
             surface.indices,
             TRIANGLES,
             vertexShaderSource,

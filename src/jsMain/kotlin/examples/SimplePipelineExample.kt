@@ -4,6 +4,7 @@ import common.Application
 import common.Attribute.Companion.attribute
 import common.Initializer
 import common.Pipeline
+import common.uniformMap
 import web.gl.WebGL2RenderingContext
 import web.gl.WebGL2RenderingContext.Companion.COLOR_BUFFER_BIT
 import web.gl.WebGL2RenderingContext.Companion.DEPTH_BUFFER_BIT
@@ -32,7 +33,7 @@ object SimplePipelineExample : Initializer<Application> {
                     )
                 )
             ),
-            mapOf(),
+            uniformMap {  },
             arrayOf(0, 1, 2, 0, 2, 3),
             TRIANGLES,
             """
