@@ -3,13 +3,16 @@ package common
 import web.gl.Float32List
 import web.gl.WebGL2RenderingContext
 import web.gl.WebGLUniformLocation
+import kotlin.reflect.KClass
+import kotlin.reflect.cast
 
 class UniformMap(private val uniforms: Map<String, Uniform<*>>) {
 
     @Suppress("unchecked_cast")
-    operator fun <T : Any> get(name: String): T {
-        return uniforms.getValue(name).value as T
-    }
+    operator fun <T : Any> get(name: String): T = uniforms.getValue(name).value as T
+
+    operator fun <T : Any> get(name: String, aKClass: KClass<T>): T =
+        aKClass.cast(uniforms.getValue(name).value)
 
     @Suppress("unchecked_cast")
     operator fun <T : Any> set(name: String, value: T) {
@@ -24,20 +27,36 @@ class UniformMapBuilder {
 
     private val uniforms = mutableMapOf<String, Uniform<*>>()
 
+    fun uniform(name: String, value: Vector1) {
+        uniforms[name] = Vector1Uniform(value)
+    }
+
+    fun uniform(name: String, value: Vector3) {
+        uniforms[name] = Vector3Uniform(value)
+    }
+
+    fun uniform(name: String, value: Vector4) {
+        uniforms[name] = Vector4Uniform(value)
+    }
+
+    fun uniform(name: String, value: Matrix4) {
+        uniforms[name] = Matrix4Uniform(value)
+    }
+
     operator fun Pair<String, Vector1>.unaryPlus() {
-        uniforms[first] = Vector1Uniform(second)
+        uniform(first, second)
     }
 
     operator fun Pair<String, Vector3>.unaryPlus() {
-        uniforms[first] = Vector3Uniform(second)
+        uniform(first, second)
     }
 
     operator fun Pair<String, Vector4>.unaryPlus() {
-        uniforms[first] = Vector4Uniform(second)
+        uniform(first, second)
     }
 
     operator fun Pair<String, Matrix4>.unaryPlus() {
-        uniforms[first] = Matrix4Uniform(second)
+        uniform(first, second)
     }
 
     fun build() = UniformMap(uniforms.toMap())

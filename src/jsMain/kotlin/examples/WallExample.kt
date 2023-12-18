@@ -36,13 +36,13 @@ object WallExample : Initializer<Application> {
         gl.clearColor(clearColor.x, clearColor.y, clearColor.z, clearColor.w)
 
         val uniforms = uniformMap {
-            +("u_LightDirection" to Vector3(0f, 0f, -1f))
-            +("u_LightAmbient" to Vector4(0.01f, 0.01f, 0.01f, 1f))
-            +("u_LightDiffuse" to Vector4(0.5f, 0.5f, 0.5f, 1f))
-            +("u_MaterialDiffuse" to Vector4(0.1f, 0.5f, 0.8f, 1f))
-            +("u_ModelViewMatrix" to Matrix4())
-            +("u_ProjectionMatrix" to Matrix4())
-            +("u_NormalMatrix" to Matrix4())
+            uniform("u_LightDirection", Vector3(0f, 0f, -1f))
+            uniform("u_LightAmbient", Vector4(0.01f, 0.01f, 0.01f, 1f))
+            uniform("u_LightDiffuse", Vector4(0.5f, 0.5f, 0.5f, 1f))
+            uniform("u_MaterialDiffuse", Vector4(0.1f, 0.5f, 0.8f, 1f))
+            uniform("u_ModelViewMatrix", Matrix4())
+            uniform("u_ProjectionMatrix", Matrix4())
+            uniform("u_NormalMatrix", Matrix4())
         }
         val pipeline = Pipeline(
             mapOf(
@@ -92,7 +92,7 @@ object WallExample : Initializer<Application> {
                 gl.clear(WebGL2RenderingContext.COLOR_BUFFER_BIT.toInt() or WebGL2RenderingContext.DEPTH_BUFFER_BIT.toInt())
                 gl.viewport(0, 0, canvas.width, canvas.height)
 
-                uniforms.get<Matrix4>("u_ProjectionMatrix").perspective(
+                uniforms["u_ProjectionMatrix", Matrix4::class].perspective(
                     toRadians(45f),
                     aspect(canvas.clientWidth, canvas.clientHeight),
                     0.1f,
