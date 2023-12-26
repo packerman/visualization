@@ -10,10 +10,6 @@ interface Application {
     fun render(gl: WebGL2RenderingContext)
 }
 
-interface Initializer<A: Application> {
-    fun initialize(gl: WebGL2RenderingContext): A
-}
-
 fun run(gl: WebGL2RenderingContext, application: Application) {
     var lastTime = Date.now()
 

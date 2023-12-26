@@ -7,8 +7,8 @@ import web.gl.WebGL2RenderingContext.Companion.TRIANGLES
 import web.html.HTMLCanvasElement
 
 @Suppress("unused")
-object GoraudPhongExample : Initializer<Application> {
-    override fun initialize(gl: WebGL2RenderingContext): Application {
+object GoraudPhongExample : Creator<Application> {
+    override fun create(gl: WebGL2RenderingContext): Application {
 
         val surface = ParametricSurface.sphere(
             radius = 0.5f,

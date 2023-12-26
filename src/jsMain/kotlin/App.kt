@@ -17,7 +17,7 @@ fun main() {
     gl.clearColor(0.5, 0.5, 0.5, 1)
     gl.enable(WebGL2RenderingContext.DEPTH_TEST)
 
-    val app = WallExample.initialize(gl)
+    val app = WallExample.create(gl)
 
     logWebGLParameters(gl)
 

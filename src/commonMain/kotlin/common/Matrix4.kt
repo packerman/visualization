@@ -17,8 +17,6 @@ data class Matrix4 internal constructor(val a: FloatArray) {
         this[15] = 1f
     }
 
-    constructor(vararg floats: Float) : this(floats)
-
     private operator fun get(i: Int) = a[i]
 
     private operator fun set(i: Int, value: Float) {
@@ -41,7 +39,7 @@ data class Matrix4 internal constructor(val a: FloatArray) {
 
     fun translate(out: Matrix4, v: Vector3) = translate(out, this, v)
 
-    fun translate(v: Vector3) = translate(this,  v)
+    fun translate(v: Vector3) = translate(this, v)
 
     fun rotate(out: Matrix4, rad: Float, axis: Vector3) = rotate(out, this, rad, axis)
 
@@ -69,12 +67,7 @@ data class Matrix4 internal constructor(val a: FloatArray) {
     }
 
     companion object {
-        fun identity() = Matrix4(
-            1f, 0f, 0f, 0f,
-            0f, 1f, 0f, 0f,
-            0f, 0f, 1f, 0f,
-            0f, 0f, 0f, 1f
-        )
+        fun identity() = identity(Matrix4())
 
         fun identity(result: Matrix4): Matrix4 {
             for (i in 0..15) {

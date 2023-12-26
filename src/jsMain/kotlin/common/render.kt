@@ -1,6 +1,5 @@
 package common
 
-import js.typedarrays.Float32Array
 import js.typedarrays.Uint16Array
 import web.gl.GLenum
 import web.gl.WebGL2RenderingContext
@@ -10,32 +9,10 @@ import web.gl.WebGL2RenderingContext.Companion.FLOAT
 import web.gl.WebGL2RenderingContext.Companion.FLOAT_VEC2
 import web.gl.WebGL2RenderingContext.Companion.FLOAT_VEC3
 import web.gl.WebGL2RenderingContext.Companion.FLOAT_VEC4
-import web.gl.WebGLBuffer
 import web.gl.WebGLVertexArrayObject
 
-typealias AttributeSupplier = (WebGL2RenderingContext) -> Attribute
-
-class Attribute(private val arrayBuffer: WebGLBuffer, private val length: Int) {
-
-    fun getCount(size: Int): Int {
-        require(length % size == 0)
-        return length / size
-    }
-
-    companion object {
-        fun attribute(floatArray: Array<Float>): AttributeSupplier {
-            return { gl ->
-                val buffer = requireNotNull(gl.createBuffer()) { "Cannot create buffer" }
-                gl.bindBuffer(ARRAY_BUFFER, buffer)
-                gl.bufferData(ARRAY_BUFFER, Float32Array(floatArray), WebGL2RenderingContext.STATIC_DRAW)
-                Attribute(buffer, floatArray.size)
-            }
-        }
-    }
-}
-
 class Pipeline(
-    val attributes: Map<String, AttributeSupplier>,
+    val attributes: Map<String, Supplier<Attribute>>,
     val uniforms: UniformMap,
     val indices: Array<Short>,
     val mode: GLenum,

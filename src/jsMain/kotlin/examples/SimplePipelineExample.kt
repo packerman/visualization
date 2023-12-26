@@ -2,7 +2,7 @@ package examples
 
 import common.Application
 import common.Attribute.Companion.attribute
-import common.Initializer
+import common.Creator
 import common.Pipeline
 import common.uniformMap
 import web.gl.WebGL2RenderingContext
@@ -12,9 +12,9 @@ import web.gl.WebGL2RenderingContext.Companion.TRIANGLES
 import web.html.HTMLCanvasElement
 
 @Suppress("unused")
-object SimplePipelineExample : Initializer<Application> {
+object SimplePipelineExample : Creator<Application> {
 
-    override fun initialize(gl: WebGL2RenderingContext): Application {
+    override fun create(gl: WebGL2RenderingContext): Application {
         val pipeline = Pipeline(
             mapOf("aVertexPosition" to attribute(
                 arrayOf(

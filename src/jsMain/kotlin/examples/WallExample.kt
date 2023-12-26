@@ -9,8 +9,8 @@ import kotlin.math.cos
 import kotlin.math.sin
 
 @Suppress("unused")
-object WallExample : Initializer<Application> {
-    override fun initialize(gl: WebGL2RenderingContext): Application {
+object WallExample : Creator<Application> {
+    override fun create(gl: WebGL2RenderingContext): Application {
 
         val positions = arrayOf(
             -20f, -8f, 20f,
