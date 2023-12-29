@@ -10,10 +10,18 @@ import web.gl.WebGL2RenderingContext.Companion.TRIANGLES
 import web.gl.WebGLVertexArrayObject
 
 @Suppress("unused")
-class UniformIntro private constructor(
+class AnimationIntro private constructor(
     private val program: Program,
-    private val shapes: List<Shape>
+    private val shapes: List<Shape>,
+    private val translation: Uniform<Vector3>
 ) : Base {
+    override fun update(elapsed: Double, keyState: KeyState) {
+        translation.data.x += 0.01f
+        if (translation.data.x > 1.2f) {
+            translation.data.x = -1.2f
+        }
+    }
+
     override fun render(gl: WebGL2RenderingContext) {
         gl.clear(WebGL2RenderingContext.COLOR_BUFFER_BIT)
         for (shape in shapes) {
@@ -21,7 +29,7 @@ class UniformIntro private constructor(
         }
     }
 
-    companion object : Initializer<UniformIntro> {
+    companion object : Initializer<AnimationIntro> {
         private data class VertexArray(
             val glObject: WebGLVertexArrayObject,
             val count: Int
@@ -41,7 +49,7 @@ class UniformIntro private constructor(
             }
         }
 
-        override fun initialize(gl: WebGL2RenderingContext): UniformIntro {
+        override fun initialize(gl: WebGL2RenderingContext): AnimationIntro {
             gl.clearColor(0.9, 0.9, 0.9, 1.0)
             gl.lineWidth(5f)
             val program = Program.build(
@@ -74,21 +82,16 @@ class UniformIntro private constructor(
                     )
                 )
             )
+            val translation = uniform(Vector3(-0.5f, 0f, 0f))
             val shapes = listOf(
                 Shape(
                     program, vertexArray, mapOf(
-                        "u_Translation" to uniform(Vector3(-0.5f, 0f, 0f)),
+                        "u_Translation" to translation,
                         "u_BaseColor" to uniform(Vector3(1f, 0f, 0f))
-                    ), TRIANGLES
-                ),
-                Shape(
-                    program, vertexArray, mapOf(
-                        "u_Translation" to uniform(Vector3(0.5f, 0f, 0f)),
-                        "u_BaseColor" to uniform(Vector3(0f, 0f, 1f))
                     ), TRIANGLES
                 )
             )
-            return UniformIntro(program, shapes)
+            return AnimationIntro(program, shapes, translation)
         }
 
         private fun setupVertexArray(

@@ -2,27 +2,18 @@ package framework.math
 
 import kotlin.math.sqrt
 
-data class Vector3(private var _x: Float, private var _y: Float, private var _z: Float) {
-
-    val x: Float
-        get() = _x
-
-    val y: Float
-        get() = _y
-
-    val z: Float
-        get() = _z
+data class Vector3(var x: Float, var y: Float, var z: Float) {
 
     fun copyTo(other: Vector3) {
-        other._x = x
-        other._y = y
-        other._z = z
+        other.x = x
+        other.y = y
+        other.z = z
     }
 
     fun set(x: Float, y: Float, z: Float) {
-        _x = x
-        _y = y
-        _z = z
+        this.x = x
+        this.y = y
+        this.z = z
     }
 
     operator fun plus(other: Vector3): Vector3 = Vector3(
@@ -63,6 +54,6 @@ data class Vector3(private var _x: Float, private var _y: Float, private var _z:
         x * other.y - y * other.x
     )
 
-    fun asSequence(): Sequence<Float> = sequenceOf(_x, _y, _z)
+    fun asSequence(): Sequence<Float> = sequenceOf(x, y, z)
 }
 
