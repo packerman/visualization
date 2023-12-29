@@ -1,26 +1,32 @@
-package v1.common
+package framework.core
 
+import dat.gui.dat.GUI
 import framework.math.Vector3
 import framework.math.Vector4
-import v1.dat.gui.dat.GUI
 import js.core.jso
 
-fun gui(name: String, width: Number, block: (GUIBuilder).() -> Unit): GUI {
-    val builder = GUIBuilder(name, width)
-    block(builder)
-    return builder.build()
+fun gui(block: (GUIBuilder).() -> Unit): GUI = gui(GUI(), block)
+
+fun gui(name: String, block: (GUIBuilder).() -> Unit): GUI {
+    val params: dynamic = jso()
+    params.name = name
+    return gui(GUI(params), block)
 }
 
-class GUIBuilder(name: String, width: Number) {
+fun gui(name: String, width: Number, block: (GUIBuilder).() -> Unit): GUI {
+    val params: dynamic = jso()
+    params.name = name
+    params.width = width
+    return gui(GUI(params), block)
+}
 
-    private val params: dynamic = jso()
-    private val gui: GUI
+private fun gui(gui: GUI, block: (GUIBuilder).() -> Unit): GUI {
+    val builder = GUIBuilder(gui)
+    block(builder)
+    return gui
+}
 
-    init {
-        params.name = name
-        params.width = width
-        gui = GUI(params)
-    }
+class GUIBuilder(private val gui: GUI) {
 
     fun color(name: String, value: Vector3, onChange: (Vector3) -> Unit) {
         val state: dynamic = jso()
@@ -60,6 +66,17 @@ class GUIBuilder(name: String, width: Number) {
         controller.onChange { onChange(it.toFloat()) }
     }
 
+    fun number(
+        name: String,
+        value: Float,
+        onChange: (Float) -> Unit
+    ) {
+        val state: dynamic = jso()
+        state[name] = value
+        val controller = gui.add(state, name)
+        controller.onChange { onChange(it.toFloat()) }
+    }
+
     fun vector(
         name: String,
         value: Vector3,
@@ -85,6 +102,10 @@ class GUIBuilder(name: String, width: Number) {
         add(state, nameZ, value.z, range, step, callback)
     }
 
+    fun folder(name: String, block: GUIBuilder.() -> Unit) {
+        gui(this.gui.addFolder(name), block)
+    }
+
     private fun add(
         state: dynamic,
         name: String,
@@ -97,7 +118,5 @@ class GUIBuilder(name: String, width: Number) {
         val controller = gui.add(state, name, range.start, range.endInclusive, step)
         controller.onChange { onChange(state, it.toFloat()) }
     }
-
-    fun build(): GUI = gui
 }
 

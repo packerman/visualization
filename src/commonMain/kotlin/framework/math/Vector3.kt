@@ -2,7 +2,33 @@ package framework.math
 
 import kotlin.math.sqrt
 
-data class Vector3(var x: Float, var y: Float, var z: Float) {
+data class Vector3(private val v: FloatArray) {
+
+    constructor(x: Float, y: Float, z: Float) : this(floatArrayOf(x, y, z))
+
+    operator fun get(i: Int): Float = v[i]
+
+    operator fun set(i: Int, value: Float) {
+        v[i] = value
+    }
+
+    var x: Float
+        get() = this[0]
+        set(value) {
+            this[0] = value
+        }
+
+    var y: Float
+        get() = this[1]
+        set(value) {
+            this[1] = value
+        }
+
+    var z: Float
+        get() = this[2]
+        set(value) {
+            this[2] = value
+        }
 
     fun copyTo(other: Vector3) {
         other.x = x
@@ -55,5 +81,18 @@ data class Vector3(var x: Float, var y: Float, var z: Float) {
     )
 
     fun asSequence(): Sequence<Float> = sequenceOf(x, y, z)
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || this::class != other::class) return false
+
+        other as Vector3
+
+        return v.contentEquals(other.v)
+    }
+
+    override fun hashCode(): Int {
+        return v.contentHashCode()
+    }
 }
 

@@ -9,12 +9,14 @@ import kotlin.js.Date
 
 interface Base {
 
+    fun start(gl: WebGL2RenderingContext) {}
+
     fun update(elapsed: Double, keyState: KeyState) {}
 
     fun render(gl: WebGL2RenderingContext)
 
     companion object {
-        fun <B: Base> run(canvas: HTMLCanvasElement, initializer: Initializer<B>) {
+        fun <B : Base> run(canvas: HTMLCanvasElement, initializer: Initializer<B>) {
             val gl = requireNotNull(canvas.getContext(WebGL2RenderingContext.ID)) {
                 "Cannot initialize WebGL2 context"
             }
@@ -24,6 +26,8 @@ interface Base {
             val keyState = KeyState()
             document.onkeydown = keyState::setPressed
             document.onkeyup = keyState::setReleased
+
+            base.start(gl)
 
             requestAnimationLoop { currentTime ->
                 resizeCanvasToDisplaySize(gl)

@@ -1,5 +1,6 @@
 package v1.examples
 
+import framework.core.gui
 import framework.math.Matrix4
 import framework.math.Vector3
 import framework.math.aspect

@@ -1,6 +1,7 @@
 package v1.examples
 
 import framework.core.KeyState
+import framework.core.gui
 import framework.math.*
 import v1.common.*
 import v1.common.Attribute.Companion.attribute
@@ -61,23 +62,23 @@ object GoraudPhongExample : Creator<Application> {
 
         gui("My Gui", 430) {
             color("Light Color", lightDiffuse) { it.copyTo(lightDiffuse) }
-            number("Light Ambient Term", lightAmbient.x, 0f..1f,  0.01f) {
+            number("Light Ambient Term", lightAmbient.x, 0f..1f, 0.01f) {
                 lightAmbient.set(it, it, it, 1f)
             }
-            number("Light Specular Term", lightSpecular.x, 0f..1f,  0.01f) {
+            number("Light Specular Term", lightSpecular.x, 0f..1f, 0.01f) {
                 lightSpecular.set(it, it, it, 1f)
             }
             vector("Translate", lightDirection, -10f..10f, -0.1f) {
                 lightDirection.set(-it.x, -it.y, it.z)
             }
             color("Sphere Color", materialDiffuse) { it.copyTo(materialDiffuse) }
-            number("Material Ambient Term", materialAmbient.x, 0f..1f,  0.01f) {
+            number("Material Ambient Term", materialAmbient.x, 0f..1f, 0.01f) {
                 materialAmbient.set(it, it, it, 1f)
             }
-            number("Material Specular Term", materialSpecular.x, 0f..1f,  0.01f) {
+            number("Material Specular Term", materialSpecular.x, 0f..1f, 0.01f) {
                 materialSpecular.set(it, it, it, 1f)
             }
-            number("Shininess", shininess.x, 0f..50f,  0.1f) {
+            number("Shininess", shininess.x, 0f..50f, 0.1f) {
                 shininess.set(it)
             }
             color("Background", clearColor) {

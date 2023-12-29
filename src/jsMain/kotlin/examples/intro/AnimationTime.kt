@@ -7,17 +7,22 @@ import framework.math.Vector3
 import web.gl.GLenum
 import web.gl.WebGL2RenderingContext
 import web.gl.WebGL2RenderingContext.Companion.TRIANGLES
-import web.gl.WebGLUniformLocation
 import web.gl.WebGLVertexArrayObject
-
-typealias UniformLocation = Pair<Uniform<*>, WebGLUniformLocation?>
-
-typealias UniformMap = Map<String, Uniform<*>>
+import kotlin.js.Date
+import kotlin.math.cos
+import kotlin.math.sin
 
 @Suppress("unused")
-class UniformIntro private constructor(
-    private val program: Program, private val shapes: List<Shape>
+class AnimationTime private constructor(
+    private val program: Program,
+    private val shapes: List<Shape>,
+    private val translation: Uniform<Vector3>
 ) : Base {
+    override fun update(elapsed: Double, keyState: KeyState) {
+        val time = Date.now().toFloat() / 1000f
+        translation.data.x = 0.75f * cos(time)
+        translation.data.y = 0.75f * sin(time)
+    }
 
     override fun render(gl: WebGL2RenderingContext) {
         gl.clear(WebGL2RenderingContext.COLOR_BUFFER_BIT)
@@ -26,45 +31,32 @@ class UniformIntro private constructor(
         }
     }
 
-    companion object : Initializer<UniformIntro> {
-        
+    companion object : Initializer<AnimationTime> {
         private data class VertexArray(
-            val id: WebGLVertexArrayObject, val count: Int
+            val glObject: WebGLVertexArrayObject,
+            val count: Int
         )
 
         private data class Shape(
-            val program: Program, val vertexArray: VertexArray, val uniforms: List<UniformLocation>, val mode: GLenum
+            val program: Program,
+            val vertexArray: VertexArray,
+            val uniforms: Map<String, Uniform<*>>,
+            val mode: GLenum
         ) {
             fun render(gl: WebGL2RenderingContext) {
                 program.use(gl)
-                uploadData(gl, uniforms)
-                gl.bindVertexArray(vertexArray.id)
+                uploadData(gl, program, uniforms)
+                gl.bindVertexArray(vertexArray.glObject)
                 gl.drawArrays(mode, 0, vertexArray.count)
-            }
-
-            companion object {
-                fun create(
-                    program: Program, vertexArray: VertexArray, uniforms: UniformMap, mode: GLenum
-                ): Shape {
-                    return Shape(program, vertexArray, associateUniforms(program, uniforms), mode)
-                }
-
-                private fun uploadData(gl: WebGL2RenderingContext, uniformLocations: List<UniformLocation>) {
-                    for ((uniform, location) in uniformLocations) {
-                        uniform.uploadData(gl, location)
-                    }
-                }
-
-                private fun associateUniforms(program: Program, uniforms: UniformMap): List<UniformLocation> =
-                    uniforms.map { (name, uniform) -> uniform to program.getUniform(name).location }
             }
         }
 
-        override fun initialize(gl: WebGL2RenderingContext): UniformIntro {
+        override fun initialize(gl: WebGL2RenderingContext): AnimationTime {
             gl.clearColor(0.9, 0.9, 0.9, 1.0)
             gl.lineWidth(5f)
             val program = Program.build(
-                gl, """
+                gl,
+                """
                     in vec3 a_position;
                     
                     uniform vec3 u_Translation;
@@ -72,7 +64,8 @@ class UniformIntro private constructor(
                     void main() {
                         gl_Position = vec4(a_position + u_Translation, 1.0);
                     }
-                """, """
+                """,
+                """
                     uniform vec3 u_BaseColor;
                     out vec4 fragColor;
                     
@@ -91,23 +84,22 @@ class UniformIntro private constructor(
                     )
                 )
             )
+            val translation = uniform(Vector3(-0.5f, 0f, 0f))
             val shapes = listOf(
-                Shape.create(
+                Shape(
                     program, vertexArray, mapOf(
-                        "u_Translation" to uniform(Vector3(-0.5f, 0f, 0f)),
+                        "u_Translation" to translation,
                         "u_BaseColor" to uniform(Vector3(1f, 0f, 0f))
-                    ), TRIANGLES
-                ), Shape.create(
-                    program, vertexArray, mapOf(
-                        "u_Translation" to uniform(Vector3(0.5f, 0f, 0f)), "u_BaseColor" to uniform(Vector3(0f, 0f, 1f))
                     ), TRIANGLES
                 )
             )
-            return UniformIntro(program, shapes)
+            return AnimationTime(program, shapes, translation)
         }
 
         private fun setupVertexArray(
-            gl: WebGL2RenderingContext, program: Program, attributes: Map<String, AttributeInitializer>
+            gl: WebGL2RenderingContext,
+            program: Program,
+            attributes: Map<String, AttributeInitializer>
         ): VertexArray {
             val vertexArray = requireNotNull(gl.createVertexArray()) {
                 "Cannot create vertex array object"
@@ -119,9 +111,18 @@ class UniformIntro private constructor(
             }
             return VertexArray(
                 vertexArray,
-                attributes.asSequence().map { (_, attribute) -> attribute.count }.distinct().single()
+                attributes.asSequence()
+                    .map { (_, attribute) -> attribute.count }
+                    .distinct()
+                    .single()
 
             )
+        }
+
+        private fun uploadData(gl: WebGL2RenderingContext, program: Program, uniforms: Map<String, Uniform<*>>) {
+            for ((name, uniform) in uniforms) {
+                uniform.uploadData(gl, program.getUniform(name).location)
+            }
         }
     }
 }

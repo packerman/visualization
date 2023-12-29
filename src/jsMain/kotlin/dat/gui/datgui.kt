@@ -1,11 +1,16 @@
-package v1.dat.gui
+@file:Suppress("UNUSED")
+
+package dat.gui
 
 @JsModule("dat.gui")
 @JsNonModule
 external class dat {
     class GUI(params: dynamic = definedExternally) {
+
         fun addFolder(name: String): GUI
+
         fun add(target: dynamic, property: String): Controller<Number>
+
         fun add(
             target: dynamic,
             property: String,
