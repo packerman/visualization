@@ -4,13 +4,17 @@ import web.gl.*
 
 class Program(
     private val program: WebGLProgram,
-    val attributes: Map<String, ActiveAttribute>,
-    val uniforms: Map<String, ActiveUniform>
+    private val attributes: Map<String, ActiveAttribute>,
+    private val uniforms: Map<String, ActiveUniform>
 ) {
 
     fun use(gl: WebGL2RenderingContext) {
         gl.useProgram(program)
     }
+
+    fun getAttribute(name: String): ActiveAttribute = attributes.getValue(name)
+
+    fun getUniform(name: String): ActiveUniform = uniforms.getValue(name)
 
     companion object {
         data class ActiveAttribute(val location: GLint, val type: GLenum)
