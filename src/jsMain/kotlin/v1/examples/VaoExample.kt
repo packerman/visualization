@@ -1,9 +1,9 @@
 package v1.examples
 
-import v1.common.Application
 import framework.core.Program
 import js.typedarrays.Float32Array
 import js.typedarrays.Uint16Array
+import v1.common.Application
 import web.gl.GLint
 import web.gl.WebGL2RenderingContext
 import web.gl.WebGL2RenderingContext.Companion.ARRAY_BUFFER
@@ -20,7 +20,7 @@ class VaoExample(
     private val vao: WebGLVertexArrayObject,
     private val positionLocation: GLint,
     private val count: Int
-): Application {
+) : Application {
     override fun render(gl: WebGL2RenderingContext) {
         gl.clear(COLOR_BUFFER_BIT.toInt() or DEPTH_BUFFER_BIT.toInt())
         gl.viewport(0, 0, (gl.canvas as HTMLCanvasElement).width, (gl.canvas as HTMLCanvasElement).height)
@@ -56,7 +56,7 @@ class VaoExample(
             val program = Program.build(gl, vertexShaderSource, fragmentShaderSource)
             program.use(gl)
 
-            val position = program.attributes.getValue("aVertexPosition")
+            val position = program.getAttribute("aVertexPosition")
 
             gl.vertexAttribPointer(position.location, 3, WebGL2RenderingContext.FLOAT, 0, 0, 0)
             gl.enableVertexAttribArray(position.location)

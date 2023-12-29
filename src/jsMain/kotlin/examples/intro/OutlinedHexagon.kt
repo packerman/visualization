@@ -50,8 +50,8 @@ class OutlinedHexagon(
                 arrayOf(-0.4f, -0.6f, 0f), arrayOf(0.4f, -0.6f, 0f)
             )
             val vertexCount = positionData.size
-            val positionAttribute = attribute(positionData)(gl)
-            positionAttribute.associateLocation(gl, program.attributes.getValue("a_position").location)
+            val positionAttribute = attribute(positionData).initialize(gl)
+            positionAttribute.associateLocation(gl, program.getAttribute("a_position").location)
             return OutlinedHexagon(program, vao, vertexCount)
         }
     }

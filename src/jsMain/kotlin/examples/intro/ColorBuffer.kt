@@ -1,7 +1,10 @@
 package examples.intro
 
-import framework.core.*
 import framework.core.Attribute.Companion.attribute
+import framework.core.AttributeInitializer
+import framework.core.Base
+import framework.core.Initializer
+import framework.core.Program
 import framework.math.Vector3
 import js.core.toTypedArray
 import web.gl.GLenum
@@ -111,18 +114,18 @@ class ColorBuffer(
         private fun setupVertexArray(
             gl: WebGL2RenderingContext,
             program: Program,
-            attributes: Map<String, Supplier<Attribute>>,
+            attributes: Map<String, AttributeInitializer>,
             mode: GLenum
         ): Shape {
             val vao = requireNotNull(gl.createVertexArray()) {
                 "Cannot create vertex array object"
             }
             val vertexCount = mutableSetOf<Int>()
-            for ((name, supplier) in attributes) {
+            for ((name, initializer) in attributes) {
                 gl.bindVertexArray(vao)
-                val attribute = supplier(gl)
+                val attribute = initializer.initialize(gl)
                 vertexCount.add(attribute.count)
-                attribute.associateLocation(gl, program.attributes.getValue(name).location)
+                attribute.associateLocation(gl, program.getAttribute(name).location)
             }
             return Shape(vao, vertexCount.single(), mode)
         }

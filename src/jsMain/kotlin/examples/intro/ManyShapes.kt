@@ -1,6 +1,5 @@
 package examples.intro
 
-import framework.core.Attribute
 import framework.core.Attribute.Companion.attribute
 import framework.core.Base
 import framework.core.Initializer
@@ -60,8 +59,8 @@ class ManyShapes(
                 }
                 gl.bindVertexArray(vao)
                 val vertexCount = data.size
-                val attribute = attribute(data)(gl)
-                attribute.associateLocation(gl, program.attributes.getValue("a_position").location)
+                val attribute = attribute(data).initialize(gl)
+                attribute.associateLocation(gl, program.getAttribute("a_position").location)
                 return Shape(vao, vertexCount)
             }
 

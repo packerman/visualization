@@ -31,7 +31,7 @@ class Pipeline(
         gl.bindVertexArray(vao)
 
         for ((name, supplyAttribute) in attributes) {
-            val active = program.attributes.getValue(name)
+            val active = program.getAttribute(name)
 
             supplyAttribute(gl)
 
@@ -47,7 +47,7 @@ class Pipeline(
         gl.bufferData(ELEMENT_ARRAY_BUFFER, Uint16Array(indices), WebGL2RenderingContext.STATIC_DRAW)
 
         val activeUniforms = uniforms.asSequence()
-            .map { (name, uniform) -> uniform to program.uniforms.getValue(name) }
+            .map { (name, uniform) -> uniform to program.getUniform(name) }
             .toList()
 
         gl.bindVertexArray(null)

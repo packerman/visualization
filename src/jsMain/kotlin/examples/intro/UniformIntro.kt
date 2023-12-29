@@ -2,129 +2,122 @@ package examples.intro
 
 import framework.core.*
 import framework.core.Attribute.Companion.attribute
+import framework.core.Uniform.Companion.uniform
 import framework.math.Vector3
-import js.core.toTypedArray
 import web.gl.GLenum
 import web.gl.WebGL2RenderingContext
-import web.gl.WebGL2RenderingContext.Companion.LINE_LOOP
-import web.gl.WebGL2RenderingContext.Companion.POINTS
-import web.gl.WebGL2RenderingContext.Companion.TRIANGLE_FAN
+import web.gl.WebGL2RenderingContext.Companion.TRIANGLES
 import web.gl.WebGLVertexArrayObject
 
 @Suppress("unused")
-class ColorBuffer(
+class UniformIntro private constructor(
     private val program: Program,
     private val shapes: List<Shape>
 ) : Base {
     override fun render(gl: WebGL2RenderingContext) {
         gl.clear(WebGL2RenderingContext.COLOR_BUFFER_BIT)
-        program.use(gl)
         for (shape in shapes) {
             shape.render(gl)
         }
     }
 
-    companion object : Initializer<ColorBuffer> {
-        data class Shape(
-            val vertexArray: WebGLVertexArrayObject,
-            val vertexCount: Int,
+    companion object : Initializer<UniformIntro> {
+        private data class VertexArray(
+            val glObject: WebGLVertexArrayObject,
+            val count: Int
+        )
+
+        private data class Shape(
+            val program: Program,
+            val vertexArray: VertexArray,
+            val uniforms: Map<String, Uniform>,
             val mode: GLenum
         ) {
             fun render(gl: WebGL2RenderingContext) {
-                gl.bindVertexArray(vertexArray)
-                gl.drawArrays(mode, 0, vertexCount)
+                program.use(gl)
+                uploadData(gl, program, uniforms)
+                gl.bindVertexArray(vertexArray.glObject)
+                gl.drawArrays(mode, 0, vertexArray.count)
             }
         }
 
-        override fun initialize(gl: WebGL2RenderingContext): ColorBuffer {
-            gl.clearColor(0.0, 0.0, 0.0, 1.0)
+        override fun initialize(gl: WebGL2RenderingContext): UniformIntro {
+            gl.clearColor(0.9, 0.9, 0.9, 1.0)
             gl.lineWidth(5f)
             val program = Program.build(
                 gl,
                 """
                     in vec3 a_position;
-                    in vec3 a_color;
                     
-                    out vec3 v_Color;
+                    uniform vec3 u_Translation;
                     
                     void main() {
-                        gl_PointSize = 5.0;
-                        gl_Position = vec4(a_position, 1.0);
-                        v_Color = a_color;
+                        gl_Position = vec4(a_position + u_Translation, 1.0);
                     }
                 """,
                 """
-                    in vec3 v_Color;
+                    uniform vec3 u_BaseColor;
                     out vec4 fragColor;
                     
                     void main() {
-                        fragColor = vec4(v_Color, 1.0);
+                        fragColor = vec4(u_BaseColor, 1.0);
                     }
                 """
             )
             program.use(gl)
-            val shapes = listOf(
-                createShape(0.5f, Vector3(0f, 0.5f, 0f), POINTS),
-                createShape(0.5f, Vector3(-0.5f, -0.5f, 0f), LINE_LOOP),
-                createShape(0.5f, Vector3(0.5f, -0.5f, 0f), TRIANGLE_FAN)
-            ).map { it(gl, program) }
-            return ColorBuffer(program, shapes)
-        }
-
-        private fun createShape(
-            scale: Float,
-            position: Vector3,
-            mode: GLenum
-        ): (WebGL2RenderingContext, Program) -> Shape {
-            return { gl, program ->
-                setupVertexArray(
-                    gl, program,
-                    mapOf(
-                        "a_position" to attribute(
-                            sequenceOf(
-                                Vector3(0.8f, 0f, 0f),
-                                Vector3(0.4f, 0.6f, 0f),
-                                Vector3(-0.4f, 0.6f, 0f),
-                                Vector3(-0.8f, 0f, 0f),
-                                Vector3(-0.4f, -0.6f, 0f),
-                                Vector3(0.4f, -0.6f, 0f)
-                            ).map { it * scale }
-                                .map { it + position }
-                                .toTypedArray()
-                        ),
-                        "a_color" to attribute(
-                            arrayOf(
-                                1f, 0f, 0f,
-                                1f, 0.5f, 0f,
-                                1f, 1f, 0f,
-                                0f, 1f, 0f,
-                                0f, 0f, 1f,
-                                0.5f, 0f, 1f
-                            ), 3
-                        )
-                    ),
-                    mode
+            val vertexArray = setupVertexArray(
+                gl, program, mapOf(
+                    "a_position" to attribute(
+                        arrayOf(
+                            0f, 0.2f, 0f, 0.2f, -0.2f, 0f, -0.2f, -0.2f, 0f
+                        ), 3
+                    )
                 )
-            }
+            )
+            val shapes = listOf<Shape>(
+                Shape(
+                    program, vertexArray, mapOf(
+                        "u_Translation" to uniform(Vector3(-0.5f, 0f, 0f)),
+                        "u_BaseColor" to uniform(Vector3(1f, 0f, 0f))
+                    ), TRIANGLES
+                ),
+                Shape(
+                    program, vertexArray, mapOf(
+                        "u_Translation" to uniform(Vector3(0.5f, 0f, 0f)),
+                        "u_BaseColor" to uniform(Vector3(0f, 0f, 1f))
+                    ), TRIANGLES
+                )
+            )
+            return UniformIntro(program, shapes)
         }
 
         private fun setupVertexArray(
             gl: WebGL2RenderingContext,
             program: Program,
-            attributes: Map<String, Supplier<Attribute>>,
-            mode: GLenum
-        ): Shape {
-            val vao = requireNotNull(gl.createVertexArray()) {
+            attributes: Map<String, AttributeInitializer>
+        ): VertexArray {
+            val vertexArray = requireNotNull(gl.createVertexArray()) {
                 "Cannot create vertex array object"
             }
-            val vertexCount = mutableSetOf<Int>()
-            for ((name, supplier) in attributes) {
-                gl.bindVertexArray(vao)
-                val attribute = supplier(gl)
-                vertexCount.add(attribute.count)
-                attribute.associateLocation(gl, program.attributes.getValue(name).location)
+            for ((name, initializer) in attributes) {
+                gl.bindVertexArray(vertexArray)
+                val attribute = initializer.initialize(gl)
+                attribute.associateLocation(gl, program.getAttribute(name).location)
             }
-            return Shape(vao, vertexCount.single(), mode)
+            return VertexArray(
+                vertexArray,
+                attributes.asSequence()
+                    .map { (_, attribute) -> attribute.count }
+                    .distinct()
+                    .single()
+
+            )
+        }
+
+        private fun uploadData(gl: WebGL2RenderingContext, program: Program, uniforms: Map<String, Uniform>) {
+            for ((name, uniform) in uniforms) {
+                uniform.uploadData(gl, program.getUniform(name).location)
+            }
         }
     }
 }
