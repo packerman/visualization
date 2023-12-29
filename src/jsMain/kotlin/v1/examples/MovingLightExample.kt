@@ -1,6 +1,6 @@
 package v1.examples
 
-import framework.core.KeyState
+import framework.core.Input
 import framework.core.gui
 import framework.math.Matrix4
 import framework.math.Vector3
@@ -61,7 +61,7 @@ object MovingLightExample : Creator<Application> {
         return object : Application {
             var angle = 0f
 
-            override fun update(elapsed: Double, keyState: KeyState) {
+            override fun update(elapsed: Double, input: Input) {
                 angle += (90 * elapsed).toFloat() / 1000f
             }
 

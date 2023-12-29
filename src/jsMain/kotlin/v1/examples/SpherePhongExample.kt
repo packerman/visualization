@@ -1,6 +1,6 @@
 package v1.examples
 
-import framework.core.KeyState
+import framework.core.Input
 import framework.core.gui
 import framework.math.*
 import v1.common.*
@@ -91,7 +91,7 @@ object SpherePhongExample : Creator<Application> {
         return object : Application {
             var angle = 0f
 
-            override fun update(elapsed: Double, keyState: KeyState) {
+            override fun update(elapsed: Double, input: Input) {
                 angle += (90 * elapsed).toFloat() / 1000f
             }
 

@@ -7,7 +7,7 @@ import web.gl.WebGL2RenderingContext
 import web.html.HTMLCanvasElement
 import kotlin.js.Date
 
-interface Base {
+interface Application {
 
     fun start(gl: WebGL2RenderingContext) {}
 
@@ -16,24 +16,24 @@ interface Base {
     fun render(gl: WebGL2RenderingContext)
 
     companion object {
-        fun <B : Base> run(canvas: HTMLCanvasElement, initializer: Initializer<B>) {
+        fun <A : Application> run(canvas: HTMLCanvasElement, initializer: Initializer<A>) {
             val gl = requireNotNull(canvas.getContext(WebGL2RenderingContext.ID)) {
                 "Cannot initialize WebGL2 context"
             }
-            val base = initializer.initialize(gl)
+            val application = initializer.initialize(gl)
             var lastTime = Date.now()
 
-            val keyState = KeyState()
-            document.onkeydown = keyState::setPressed
-            document.onkeyup = keyState::setReleased
+            val input = Input()
+            input.attachTo(document)
 
-            base.start(gl)
+            application.start(gl)
 
             requestAnimationLoop { currentTime ->
                 resizeCanvasToDisplaySize(gl)
                 gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight)
-                base.update(currentTime - lastTime, keyState)
-                base.render(gl)
+                application.update(currentTime - lastTime, input)
+                input.reset()
+                application.render(gl)
                 lastTime = currentTime
             }
         }

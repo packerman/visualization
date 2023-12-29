@@ -1,8 +1,8 @@
 package examples.intro
 
+import framework.core.Application
 import framework.core.Attribute.Companion.attribute
 import framework.core.AttributeInitializer
-import framework.core.Base
 import framework.core.Initializer
 import framework.core.Program
 import framework.math.Vector3
@@ -18,7 +18,7 @@ import web.gl.WebGLVertexArrayObject
 class ColorBuffer(
     private val program: Program,
     private val shapes: List<Shape>
-) : Base {
+) : Application {
     override fun render(gl: WebGL2RenderingContext) {
         gl.clear(WebGL2RenderingContext.COLOR_BUFFER_BIT)
         program.use(gl)

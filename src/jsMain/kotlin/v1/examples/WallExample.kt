@@ -1,6 +1,6 @@
 package v1.examples
 
-import framework.core.KeyState
+import framework.core.Input
 import framework.math.*
 import v1.common.*
 import v1.common.Attribute.Companion.attribute
@@ -65,17 +65,17 @@ object WallExample : Creator<Application> {
             var azimuth = 0f
             val incrementValue = 2f
 
-            override fun update(elapsed: Double, keyState: KeyState) {
-                if (keyState.isPressed("ArrowLeft")) {
+            override fun update(elapsed: Double, input: Input) {
+                if (input.isPressed("ArrowLeft")) {
                     azimuth -= incrementValue
                 }
-                if (keyState.isPressed("ArrowUp")) {
+                if (input.isPressed("ArrowUp")) {
                     elevation += incrementValue
                 }
-                if (keyState.isPressed("ArrowRight")) {
+                if (input.isPressed("ArrowRight")) {
                     azimuth += incrementValue
                 }
-                if (keyState.isPressed("ArrowDown")) {
+                if (input.isPressed("ArrowDown")) {
                     elevation -= incrementValue
                 }
                 azimuth %= 360f

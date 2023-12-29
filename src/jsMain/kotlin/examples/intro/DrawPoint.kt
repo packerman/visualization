@@ -1,6 +1,6 @@
 package examples.intro
 
-import framework.core.Base
+import framework.core.Application
 import framework.core.Initializer
 import framework.core.Program
 import web.gl.WebGL2RenderingContext
@@ -11,7 +11,7 @@ import web.gl.WebGLVertexArrayObject
 class DrawPoint(
     private val program: Program,
     private val vao: WebGLVertexArrayObject
-) : Base {
+) : Application {
 
     override fun render(gl: WebGL2RenderingContext) {
         gl.clear(WebGL2RenderingContext.COLOR_BUFFER_BIT)

@@ -1,11 +1,11 @@
 package examples.intro
 
-import framework.core.Base
+import framework.core.Application
 import framework.core.Initializer
 import web.gl.WebGL2RenderingContext
 
 @Suppress("unused")
-class Test : Base {
+class Test : Application {
 
     override fun render(gl: WebGL2RenderingContext) {
     }

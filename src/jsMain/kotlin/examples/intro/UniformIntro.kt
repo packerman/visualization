@@ -17,7 +17,7 @@ typealias UniformMap = Map<String, Uniform<*>>
 @Suppress("unused")
 class UniformIntro private constructor(
     private val program: Program, private val shapes: List<Shape>
-) : Base {
+) : Application {
 
     override fun render(gl: WebGL2RenderingContext) {
         gl.clear(WebGL2RenderingContext.COLOR_BUFFER_BIT)
@@ -27,7 +27,7 @@ class UniformIntro private constructor(
     }
 
     companion object : Initializer<UniformIntro> {
-        
+
         private data class VertexArray(
             val id: WebGLVertexArrayObject, val count: Int
         )

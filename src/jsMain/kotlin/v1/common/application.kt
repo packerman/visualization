@@ -1,11 +1,11 @@
 package v1.common
 
-import framework.core.KeyState
+import framework.core.Input
 import web.gl.WebGL2RenderingContext
 
 @Deprecated(message = "")
 interface Application {
-    fun update(elapsed: Double, keyState: KeyState) {}
+    fun update(elapsed: Double, input: Input) {}
 
     fun render(gl: WebGL2RenderingContext)
 }

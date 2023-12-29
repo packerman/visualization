@@ -14,7 +14,7 @@ class AnimationIntro private constructor(
     private val program: Program,
     private val shapes: List<Shape>,
     private val translation: Uniform<Vector3>
-) : Base {
+) : Application {
     override fun update(elapsed: Double, keyState: KeyState) {
         translation.data.x += 0.01f
         if (translation.data.x > 1.2f) {

@@ -8,20 +8,30 @@ import web.gl.GLenum
 import web.gl.WebGL2RenderingContext
 import web.gl.WebGL2RenderingContext.Companion.TRIANGLES
 import web.gl.WebGLVertexArrayObject
-import kotlin.js.Date
-import kotlin.math.cos
-import kotlin.math.sin
 
 @Suppress("unused")
-class AnimationTime private constructor(
+class MoveWithKeyboard private constructor(
     private val program: Program,
     private val shapes: List<Shape>,
     private val translation: Uniform<Vector3>
 ) : Application {
+
+    private val speed = 0.5f
+
     override fun update(elapsed: Double, keyState: KeyState) {
-        val time = Date.now().toFloat() / 1000f
-        translation.data.x = 0.75f * cos(time)
-        translation.data.y = 0.75f * sin(time)
+        val distance = speed * elapsed.toFloat() / 1000f
+        if (keyState.isPressed("ArrowLeft")) {
+            translation.data.x -= distance
+        }
+        if (keyState.isPressed("ArrowRight")) {
+            translation.data.x += distance
+        }
+        if (keyState.isPressed("ArrowDown")) {
+            translation.data.y -= distance
+        }
+        if (keyState.isPressed("ArrowUp")) {
+            translation.data.y += distance
+        }
     }
 
     override fun render(gl: WebGL2RenderingContext) {
@@ -31,7 +41,7 @@ class AnimationTime private constructor(
         }
     }
 
-    companion object : Initializer<AnimationTime> {
+    companion object : Initializer<MoveWithKeyboard> {
         private data class VertexArray(
             val glObject: WebGLVertexArrayObject,
             val count: Int
@@ -51,7 +61,7 @@ class AnimationTime private constructor(
             }
         }
 
-        override fun initialize(gl: WebGL2RenderingContext): AnimationTime {
+        override fun initialize(gl: WebGL2RenderingContext): MoveWithKeyboard {
             gl.clearColor(0.9, 0.9, 0.9, 1.0)
             gl.lineWidth(5f)
             val program = Program.build(
@@ -93,7 +103,7 @@ class AnimationTime private constructor(
                     ), TRIANGLES
                 )
             )
-            return AnimationTime(program, shapes, translation)
+            return MoveWithKeyboard(program, shapes, translation)
         }
 
         private fun setupVertexArray(

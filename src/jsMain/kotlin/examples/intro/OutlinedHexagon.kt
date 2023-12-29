@@ -1,7 +1,7 @@
 package examples.intro
 
+import framework.core.Application
 import framework.core.Attribute.Companion.attribute
-import framework.core.Base
 import framework.core.Initializer
 import framework.core.Program
 import web.gl.WebGL2RenderingContext
@@ -11,7 +11,7 @@ class OutlinedHexagon(
     private val program: Program,
     private val vao: WebGLVertexArrayObject,
     private val vertexCount: Int
-) : Base {
+) : Application {
     override fun render(gl: WebGL2RenderingContext) {
         gl.clear(WebGL2RenderingContext.COLOR_BUFFER_BIT)
         program.use(gl)

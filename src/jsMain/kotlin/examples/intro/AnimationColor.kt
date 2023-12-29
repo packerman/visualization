@@ -18,7 +18,7 @@ class AnimationColor private constructor(
     private val translation: Uniform<Vector3>,
     private val baseColor: Uniform<Vector3>
 
-) : Base {
+) : Application {
 
     private val frequencies = Vector3(3f, 0f, 0f)
     private val phases = Vector3(0f, 0f, 0f)
@@ -47,9 +47,7 @@ class AnimationColor private constructor(
     override fun update(elapsed: Double, keyState: KeyState) {
         val time = Date.now().toFloat() / 1000f
         for (i in 0..2) {
-
             baseColor.data[i] = (sin(frequencies[i] * time + phases[i]) + 1) / 2
-
         }
     }
 
