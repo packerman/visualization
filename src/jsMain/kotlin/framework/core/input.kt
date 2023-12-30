@@ -7,6 +7,7 @@ interface KeyState {
     fun isPressed(key: String): Boolean
     fun isDown(key: String): Boolean
     fun isUp(key: String): Boolean
+    fun isEmpty(): Boolean
 }
 
 class Input : KeyState {
@@ -20,6 +21,8 @@ class Input : KeyState {
     override fun isDown(key: String): Boolean = key in down
 
     override fun isUp(key: String): Boolean = key in up
+
+    override fun isEmpty(): Boolean = down.isEmpty() && pressed.isEmpty() && up.isEmpty()
 
     fun attachTo(handler: GlobalEventHandlers) {
         handler.onkeydown = this::onKeyDown
@@ -40,4 +43,6 @@ class Input : KeyState {
         up.add(event.key)
         pressed.remove(event.key)
     }
+
+    override fun toString(): String = "Input(down=$down, pressed=$pressed, up=$up)"
 }

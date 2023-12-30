@@ -27,27 +27,27 @@ class MoveTriangle private constructor(
         val moveAmount = moveSpeed * elapsed.toFloat() / 1000f
         val turnAmount = turnSpeed * elapsed.toFloat() / 1000f
 
-        if (keyState.isPressed("KeyW")) {
+        if (keyState.isPressed("w")) {
             val m = Matrix4.translation(0f, moveAmount, 0f)
             modelMatrix.data = m * modelMatrix.data
         }
-        if (keyState.isPressed("KeyS")) {
+        if (keyState.isPressed("s")) {
             val m = Matrix4.translation(0f, -moveAmount, 0f)
             modelMatrix.data = m * modelMatrix.data
         }
-        if (keyState.isPressed("KeyA")) {
+        if (keyState.isPressed("a")) {
             val m = Matrix4.translation(-moveAmount, 0f, 0f)
             modelMatrix.data = m * modelMatrix.data
         }
-        if (keyState.isPressed("KeyD")) {
+        if (keyState.isPressed("d")) {
             val m = Matrix4.translation(moveAmount, 0f, 0f)
             modelMatrix.data = m * modelMatrix.data
         }
-        if (keyState.isPressed("KeyZ")) {
+        if (keyState.isPressed("z")) {
             val m = Matrix4.translation(0f, 0f, moveAmount)
             modelMatrix.data = m * modelMatrix.data
         }
-        if (keyState.isPressed("KeyX")) {
+        if (keyState.isPressed("x")) {
             val m = Matrix4.translation(0f, 0f, -moveAmount)
             modelMatrix.data = m * modelMatrix.data
         }

@@ -1,6 +1,137 @@
 package framework.math.internal
 
+import kotlin.math.cos
+import kotlin.math.sin
 import kotlin.math.tan
+
+internal fun identity(out: FloatArray): FloatArray {
+    out[0] = 1f
+    out[1] = 0f
+    out[2] = 0f
+    out[3] = 0f
+    out[4] = 0f
+    out[5] = 1f
+    out[6] = 0f
+    out[7] = 0f
+    out[8] = 0f
+    out[9] = 0f
+    out[10] = 1f
+    out[11] = 0f
+    out[12] = 0f
+    out[13] = 0f
+    out[14] = 0f
+    out[15] = 1f
+    return out
+}
+
+internal fun fromTranslation(out: FloatArray, v: FloatArray): FloatArray {
+    out[0] = 1f
+    out[1] = 0f
+    out[2] = 0f
+    out[3] = 0f
+    out[4] = 0f
+    out[5] = 1f
+    out[6] = 0f
+    out[7] = 0f
+    out[8] = 0f
+    out[9] = 0f
+    out[10] = 1f
+    out[11] = 0f
+    out[12] = v[0]
+    out[13] = v[1]
+    out[14] = v[2]
+    out[15] = 1f
+    return out
+}
+
+internal fun fromXRotation(out: FloatArray, rad: Float): FloatArray {
+    val s = sin(rad)
+    val c = cos(rad)
+
+    out[0] = 1f
+    out[1] = 0f
+    out[2] = 0f
+    out[3] = 0f
+    out[4] = 0f
+    out[5] = c
+    out[6] = s
+    out[7] = 0f
+    out[8] = 0f
+    out[9] = -s
+    out[10] = c
+    out[11] = 0f
+    out[12] = 0f
+    out[13] = 0f
+    out[14] = 0f
+    out[15] = 1f
+    return out
+}
+
+internal fun fromYRotation(out: FloatArray, rad: Float): FloatArray {
+    val s = sin(rad)
+    val c = cos(rad)
+
+    out[0] = c
+    out[1] = 0f
+    out[2] = -s
+    out[3] = 0f
+    out[4] = 0f
+    out[5] = 1f
+    out[6] = 0f
+    out[7] = 0f
+    out[8] = s
+    out[9] = 0f
+    out[10] = c
+    out[11] = 0f
+    out[12] = 0f
+    out[13] = 0f
+    out[14] = 0f
+    out[15] = 1f
+    return out
+}
+
+internal fun fromZRotation(out: FloatArray, rad: Float): FloatArray {
+    val s = sin(rad)
+    val c = cos(rad)
+
+    out[0] = c
+    out[1] = s
+    out[2] = 0f
+    out[3] = 0f
+    out[4] = -s
+    out[5] = c
+    out[6] = 0f
+    out[7] = 0f
+    out[8] = 0f
+    out[9] = 0f
+    out[10] = 1f
+    out[11] = 0f
+    out[12] = 0f
+    out[13] = 0f
+    out[14] = 0f
+    out[15] = 1f
+    return out
+}
+
+internal fun fromScaling(out: FloatArray, v: FloatArray): FloatArray {
+    out[0] = v[0]
+    out[1] = 0f
+    out[2] = 0f
+    out[3] = 0f
+    out[4] = 0f
+    out[5] = v[1]
+    out[6] = 0f
+    out[7] = 0f
+    out[8] = 0f
+    out[9] = 0f
+    out[10] = v[2]
+    out[11] = 0f
+    out[12] = 0f
+    out[13] = 0f
+    out[14] = 0f
+    out[15] = 1f
+    return out
+}
 
 internal fun copy(out: FloatArray, a: FloatArray): FloatArray {
     out[0] = a[0]
@@ -109,4 +240,3 @@ internal fun perspectiveNO(out: FloatArray, fovy: Float, aspect: Float, near: Fl
     }
     return out
 }
-
