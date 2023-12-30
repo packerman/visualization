@@ -18,6 +18,10 @@ data class Matrix4 internal constructor(val floats: FloatArray) {
 
     operator fun times(other: Matrix4): Matrix4 = Matrix4(multiply(FloatArray(16), floats, other.floats))
 
+    operator fun timesAssign(other: Matrix4) {
+        multiply(floats, floats, other.floats)
+    }
+
     inline fun forEachIndexed(action: (Int, Float) -> Unit) {
         floats.forEachIndexed(action)
     }

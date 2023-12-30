@@ -51,6 +51,41 @@ class MoveTriangle private constructor(
             val m = Matrix4.translation(0f, 0f, -moveAmount)
             modelMatrix.data = m * modelMatrix.data
         }
+
+        if (keyState.isPressed("q")) {
+            val m = Matrix4.rotationZ(turnAmount)
+            modelMatrix.data = m * modelMatrix.data
+        }
+        if (keyState.isPressed("e")) {
+            val m = Matrix4.rotationZ(-turnAmount)
+            modelMatrix.data = m * modelMatrix.data
+        }
+
+        if (keyState.isPressed("i")) {
+            val m = Matrix4.translation(0f, moveAmount, 0f)
+            modelMatrix.data.timesAssign(m)
+        }
+        if (keyState.isPressed("j")) {
+            val m = Matrix4.translation(0f, -moveAmount, 0f)
+            modelMatrix.data.timesAssign(m)
+        }
+        if (keyState.isPressed("k")) {
+            val m = Matrix4.translation(-moveAmount, 0f, 0f)
+            modelMatrix.data.timesAssign(m)
+        }
+        if (keyState.isPressed("l")) {
+            val m = Matrix4.translation(moveAmount, 0f, 0f)
+            modelMatrix.data.timesAssign(m)
+        }
+
+        if (keyState.isPressed("u")) {
+            val m = Matrix4.rotationZ(turnAmount)
+            modelMatrix.data.timesAssign(m)
+        }
+        if (keyState.isPressed("o")) {
+            val m = Matrix4.rotationZ(-turnAmount)
+            modelMatrix.data.timesAssign(m)
+        }
     }
 
     override fun render(gl: WebGL2RenderingContext) {
