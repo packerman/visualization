@@ -10,10 +10,6 @@ import web.gl.WebGL2RenderingContext.Companion.TRIANGLES
 import web.gl.WebGLUniformLocation
 import web.gl.WebGLVertexArrayObject
 
-typealias UniformLocation = Pair<Uniform<*>, WebGLUniformLocation?>
-
-typealias UniformMap = Map<String, Uniform<*>>
-
 @Suppress("unused")
 class UniformIntro private constructor(
     private val program: Program, private val shapes: List<Shape>
@@ -33,7 +29,10 @@ class UniformIntro private constructor(
         )
 
         private data class Shape(
-            val program: Program, val vertexArray: VertexArray, val uniforms: List<UniformLocation>, val mode: GLenum
+            val program: Program,
+            val vertexArray: VertexArray,
+            val uniforms: List<Pair<Uniform<*>, WebGLUniformLocation?>>,
+            val mode: GLenum
         ) {
             fun render(gl: WebGL2RenderingContext) {
                 program.use(gl)
@@ -44,18 +43,27 @@ class UniformIntro private constructor(
 
             companion object {
                 fun create(
-                    program: Program, vertexArray: VertexArray, uniforms: UniformMap, mode: GLenum
+                    program: Program,
+                    vertexArray: VertexArray,
+                    uniforms: Map<String, Uniform<*>>,
+                    mode: GLenum
                 ): Shape {
                     return Shape(program, vertexArray, associateUniforms(program, uniforms), mode)
                 }
 
-                private fun uploadData(gl: WebGL2RenderingContext, uniformLocations: List<UniformLocation>) {
+                private fun uploadData(
+                    gl: WebGL2RenderingContext,
+                    uniformLocations: List<Pair<Uniform<*>, WebGLUniformLocation?>>
+                ) {
                     for ((uniform, location) in uniformLocations) {
                         uniform.uploadData(gl, location)
                     }
                 }
 
-                private fun associateUniforms(program: Program, uniforms: UniformMap): List<UniformLocation> =
+                private fun associateUniforms(
+                    program: Program,
+                    uniforms: Map<String, Uniform<*>>
+                ): List<Pair<Uniform<*>, WebGLUniformLocation?>> =
                     uniforms.map { (name, uniform) -> uniform to program.getUniform(name).location }
             }
         }

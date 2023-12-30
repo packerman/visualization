@@ -11,6 +11,7 @@ import web.gl.WebGL2RenderingContext.Companion.COLOR_BUFFER_BIT
 import web.gl.WebGL2RenderingContext.Companion.DEPTH_BUFFER_BIT
 import web.gl.WebGL2RenderingContext.Companion.DEPTH_TEST
 import web.gl.WebGL2RenderingContext.Companion.TRIANGLES
+import web.gl.WebGLUniformLocation
 import web.gl.WebGLVertexArrayObject
 
 @Suppress("unused")
@@ -97,21 +98,52 @@ class MoveTriangle private constructor(
 
     companion object : Initializer<MoveTriangle> {
         private data class VertexArray(
-            val glObject: WebGLVertexArrayObject,
+            val id: WebGLVertexArrayObject,
             val count: Int
         )
 
         private data class Shape(
             val program: Program,
             val vertexArray: VertexArray,
-            val uniforms: Map<String, Uniform<*>>,
+            val uniforms: List<Pair<Uniform<*>, WebGLUniformLocation?>>,
             val mode: GLenum
         ) {
             fun render(gl: WebGL2RenderingContext) {
                 program.use(gl)
-                uploadData(gl, program, uniforms)
-                gl.bindVertexArray(vertexArray.glObject)
+                uploadData(gl, uniforms)
+                gl.bindVertexArray(vertexArray.id)
                 gl.drawArrays(mode, 0, vertexArray.count)
+            }
+
+            companion object {
+                fun create(
+                    program: Program,
+                    vertexArray: VertexArray,
+                    uniforms: Map<String, Uniform<*>>,
+                    mode: GLenum
+                ): Shape {
+                    return Shape(
+                        program,
+                        vertexArray,
+                        associateUniforms(program, uniforms),
+                        mode
+                    )
+                }
+
+                private fun uploadData(
+                    gl: WebGL2RenderingContext,
+                    uniformLocations: List<Pair<Uniform<*>, WebGLUniformLocation?>>
+                ) {
+                    for ((uniform, location) in uniformLocations) {
+                        uniform.uploadData(gl, location)
+                    }
+                }
+
+                private fun associateUniforms(
+                    program: Program,
+                    uniforms: Map<String, Uniform<*>>
+                ): List<Pair<Uniform<*>, WebGLUniformLocation?>> =
+                    uniforms.map { (name, uniform) -> uniform to program.getUniform(name).location }
             }
         }
 
@@ -152,7 +184,7 @@ class MoveTriangle private constructor(
             )
             val modelMatrix = uniform(Matrix4.translation(0f, 0f, -1f))
             val shapes = listOf(
-                Shape(
+                Shape.create(
                     program, vertexArray, mapOf(
                         "u_ProjectionMatrix" to uniform(Matrix4.perspective()),
                         "u_ModelMatrix" to modelMatrix
@@ -181,14 +213,7 @@ class MoveTriangle private constructor(
                     .map { (_, attribute) -> attribute.count }
                     .distinct()
                     .single()
-
             )
-        }
-
-        private fun uploadData(gl: WebGL2RenderingContext, program: Program, uniforms: Map<String, Uniform<*>>) {
-            for ((name, uniform) in uniforms) {
-                uniform.uploadData(gl, program.getUniform(name).location)
-            }
         }
     }
 }
