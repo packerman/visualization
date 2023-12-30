@@ -2,14 +2,14 @@ package framework.math
 
 import kotlin.math.sqrt
 
-data class Vector3(private val v: FloatArray) {
+data class Vector3(private val floats: FloatArray) {
 
     constructor(x: Float, y: Float, z: Float) : this(floatArrayOf(x, y, z))
 
-    operator fun get(i: Int): Float = v[i]
+    operator fun get(i: Int): Float = floats[i]
 
     operator fun set(i: Int, value: Float) {
-        v[i] = value
+        floats[i] = value
     }
 
     var x: Float
@@ -48,12 +48,6 @@ data class Vector3(private val v: FloatArray) {
         z + other.z
     )
 
-    operator fun minus(other: Vector3): Vector3 = Vector3(
-        x - other.x,
-        y - other.y,
-        z - other.z
-    )
-
     operator fun times(factor: Float): Vector3 = Vector3(
         factor * x,
         factor * y,
@@ -88,11 +82,11 @@ data class Vector3(private val v: FloatArray) {
 
         other as Vector3
 
-        return v.contentEquals(other.v)
+        return floats.contentEquals(other.floats)
     }
 
     override fun hashCode(): Int {
-        return v.contentHashCode()
+        return floats.contentHashCode()
     }
 }
 
