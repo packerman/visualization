@@ -27,6 +27,9 @@ class Attribute(
     private val type: GLenum,
 ) {
 
+    val count: Int
+        get() = srcData.length / size.toInt()
+
     fun uploadData(gl: WebGL2RenderingContext) {
         gl.bindBuffer(ARRAY_BUFFER, buffer)
         gl.bufferData(ARRAY_BUFFER, srcData, STATIC_DRAW)
@@ -38,32 +41,46 @@ class Attribute(
         gl.enableVertexAttribArray(index)
     }
 
-    val count: Int
-        get() = srcData.length / size.toInt()
-
     companion object {
-        fun attribute(array: Array<Array<Float>>): AttributeInitializer {
+
+        operator fun invoke(gl: WebGL2RenderingContext, array: Array<Array<Float>>): Attribute {
             require(array.isNotEmpty())
             require(array[0].isNotEmpty())
             val srcData = Float32List(array.asSequence()
                 .flatMap { it.asSequence() }
                 .toTypedArray())
-            return AttributeInitializer(srcData, array[0].size)
+            return Attribute(gl, srcData, array[0].size)
         }
 
-        fun attribute(array: Array<Float>, size: Int): AttributeInitializer {
+        operator fun invoke(gl: WebGL2RenderingContext, list: List<Array<Float>>): Attribute {
+            require(list.isNotEmpty())
+            require(list[0].isNotEmpty())
+            val srcData = Float32List(list.asSequence()
+                .flatMap { it.asSequence() }
+                .toTypedArray())
+            return Attribute(gl, srcData, list[0].size)
+        }
+
+        operator fun invoke(gl: WebGL2RenderingContext, array: Array<Float>, size: Int): Attribute {
             require(array.isNotEmpty())
             require(array.size % size == 0)
             val srcData = Float32List(array)
-            return AttributeInitializer(srcData, size)
+            return Attribute(gl, srcData, size)
         }
 
-        fun attribute(array: Array<Vector3>): AttributeInitializer {
+        operator fun invoke(gl: WebGL2RenderingContext, array: Array<Vector3>): Attribute {
             require(array.isNotEmpty())
             val srcData = Float32List(array.asSequence()
                 .flatMap { it.asSequence() }
                 .toTypedArray())
-            return AttributeInitializer(srcData, 3)
+            return Attribute(gl, srcData, 3)
+        }
+
+        operator fun invoke(gl: WebGL2RenderingContext, srcData: Float32List, size: Int): Attribute {
+            val buffer = requireNotNull(gl.createBuffer())
+            val attribute = Attribute(buffer, srcData, size, FLOAT)
+            attribute.uploadData(gl)
+            return attribute
         }
     }
 }

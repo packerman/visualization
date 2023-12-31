@@ -1,12 +1,13 @@
 package examples.intro
 
 import framework.core.Application
-import framework.core.Attribute.Companion.attribute
+import framework.core.Attribute
 import framework.core.Initializer
 import framework.core.Program
 import web.gl.WebGL2RenderingContext
 import web.gl.WebGLVertexArrayObject
 
+@Suppress("unused")
 class OutlinedHexagon(
     private val program: Program,
     private val vao: WebGLVertexArrayObject,
@@ -50,7 +51,7 @@ class OutlinedHexagon(
                 arrayOf(-0.4f, -0.6f, 0f), arrayOf(0.4f, -0.6f, 0f)
             )
             val vertexCount = positionData.size
-            val positionAttribute = attribute(positionData).initialize(gl)
+            val positionAttribute = Attribute(gl, positionData)
             positionAttribute.associateLocation(gl, program.getAttribute("a_position").location)
             return OutlinedHexagon(program, vao, vertexCount)
         }

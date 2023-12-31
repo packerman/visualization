@@ -1,8 +1,10 @@
 package examples.transformations
 
 import framework.core.*
-import framework.core.Attribute.Companion.attribute
 import framework.core.Uniform.Companion.uniform
+import framework.geometry.Geometry
+import framework.geometry.Geometry.Companion.POSITION
+import framework.geometry.geometry
 import framework.math.Matrix4
 import framework.math.toRadians
 import web.gl.GLenum
@@ -29,63 +31,49 @@ class MoveTriangle private constructor(
         val turnAmount = turnSpeed * elapsed.toFloat() / 1000f
 
         if (keyState.isPressed("w")) {
-            val m = Matrix4.translation(0f, moveAmount, 0f)
-            modelMatrix.data = m * modelMatrix.data
+            modelMatrix.data = Matrix4.translation(0f, moveAmount, 0f) * modelMatrix.data
         }
         if (keyState.isPressed("s")) {
-            val m = Matrix4.translation(0f, -moveAmount, 0f)
-            modelMatrix.data = m * modelMatrix.data
+            modelMatrix.data = Matrix4.translation(0f, -moveAmount, 0f) * modelMatrix.data
         }
         if (keyState.isPressed("a")) {
-            val m = Matrix4.translation(-moveAmount, 0f, 0f)
-            modelMatrix.data = m * modelMatrix.data
+            modelMatrix.data = Matrix4.translation(-moveAmount, 0f, 0f) * modelMatrix.data
         }
         if (keyState.isPressed("d")) {
-            val m = Matrix4.translation(moveAmount, 0f, 0f)
-            modelMatrix.data = m * modelMatrix.data
+            modelMatrix.data = Matrix4.translation(moveAmount, 0f, 0f) * modelMatrix.data
         }
         if (keyState.isPressed("z")) {
-            val m = Matrix4.translation(0f, 0f, moveAmount)
-            modelMatrix.data = m * modelMatrix.data
+            modelMatrix.data = Matrix4.translation(0f, 0f, moveAmount) * modelMatrix.data
         }
         if (keyState.isPressed("x")) {
-            val m = Matrix4.translation(0f, 0f, -moveAmount)
-            modelMatrix.data = m * modelMatrix.data
+            modelMatrix.data = Matrix4.translation(0f, 0f, -moveAmount) * modelMatrix.data
         }
 
         if (keyState.isPressed("q")) {
-            val m = Matrix4.rotationZ(turnAmount)
-            modelMatrix.data = m * modelMatrix.data
+            modelMatrix.data = Matrix4.rotationZ(turnAmount) * modelMatrix.data
         }
         if (keyState.isPressed("e")) {
-            val m = Matrix4.rotationZ(-turnAmount)
-            modelMatrix.data = m * modelMatrix.data
+            modelMatrix.data = Matrix4.rotationZ(-turnAmount) * modelMatrix.data
         }
 
         if (keyState.isPressed("i")) {
-            val m = Matrix4.translation(0f, moveAmount, 0f)
-            modelMatrix.data.timesAssign(m)
+            modelMatrix.data.timesAssign(Matrix4.translation(0f, moveAmount, 0f))
         }
         if (keyState.isPressed("j")) {
-            val m = Matrix4.translation(0f, -moveAmount, 0f)
-            modelMatrix.data.timesAssign(m)
+            modelMatrix.data.timesAssign(Matrix4.translation(0f, -moveAmount, 0f))
         }
         if (keyState.isPressed("k")) {
-            val m = Matrix4.translation(-moveAmount, 0f, 0f)
-            modelMatrix.data.timesAssign(m)
+            modelMatrix.data.timesAssign(Matrix4.translation(-moveAmount, 0f, 0f))
         }
         if (keyState.isPressed("l")) {
-            val m = Matrix4.translation(moveAmount, 0f, 0f)
-            modelMatrix.data.timesAssign(m)
+            modelMatrix.data.timesAssign(Matrix4.translation(moveAmount, 0f, 0f))
         }
 
         if (keyState.isPressed("u")) {
-            val m = Matrix4.rotationZ(turnAmount)
-            modelMatrix.data.timesAssign(m)
+            modelMatrix.data.timesAssign(Matrix4.rotationZ(turnAmount))
         }
         if (keyState.isPressed("o")) {
-            val m = Matrix4.rotationZ(-turnAmount)
-            modelMatrix.data.timesAssign(m)
+            modelMatrix.data.timesAssign(Matrix4.rotationZ(-turnAmount))
         }
     }
 
@@ -99,7 +87,7 @@ class MoveTriangle private constructor(
     companion object : Initializer<MoveTriangle> {
         private data class VertexArray(
             val id: WebGLVertexArrayObject,
-            val count: Int
+            val geometry: Geometry
         )
 
         private data class Shape(
@@ -112,7 +100,7 @@ class MoveTriangle private constructor(
                 program.use(gl)
                 uploadData(gl, uniforms)
                 gl.bindVertexArray(vertexArray.id)
-                gl.drawArrays(mode, 0, vertexArray.count)
+                gl.drawArrays(mode, 0, vertexArray.geometry.vertexCount)
             }
 
             companion object {
@@ -172,16 +160,18 @@ class MoveTriangle private constructor(
             )
             program.use(gl)
             val vertexArray = setupVertexArray(
-                gl, program, mapOf(
-                    "a_position" to attribute(
+                gl, program, geometry(gl) {
+                    attribute(
+                        POSITION,
                         arrayOf(
                             0f, 0.2f, 0f,
                             0.1f, -0.2f, 0f,
                             -0.1f, -0.2f, 0f
                         ), 3
                     )
-                )
+                }
             )
+
             val modelMatrix = uniform(Matrix4.translation(0f, 0f, -1f))
             val shapes = listOf(
                 Shape.create(
@@ -197,23 +187,13 @@ class MoveTriangle private constructor(
         private fun setupVertexArray(
             gl: WebGL2RenderingContext,
             program: Program,
-            attributes: Map<String, AttributeInitializer>
+            geometry: Geometry
         ): VertexArray {
             val vertexArray = requireNotNull(gl.createVertexArray()) {
                 "Cannot create vertex array object"
             }
-            for ((name, initializer) in attributes) {
-                gl.bindVertexArray(vertexArray)
-                val attribute = initializer.initialize(gl)
-                attribute.associateLocation(gl, program.getAttribute(name).location)
-            }
-            return VertexArray(
-                vertexArray,
-                attributes.asSequence()
-                    .map { (_, attribute) -> attribute.count }
-                    .distinct()
-                    .single()
-            )
+            geometry.buildArray(gl, program)
+            return VertexArray(vertexArray, geometry)
         }
     }
 }

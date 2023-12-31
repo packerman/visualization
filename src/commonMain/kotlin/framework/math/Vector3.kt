@@ -2,7 +2,9 @@ package framework.math
 
 import kotlin.math.sqrt
 
-data class Vector3(private val floats: FloatArray) {
+data class Vector3(internal val floats: FloatArray) {
+
+    constructor() : this(FloatArray(3))
 
     constructor(x: Float, y: Float, z: Float) : this(floatArrayOf(x, y, z))
 
@@ -25,6 +27,24 @@ data class Vector3(private val floats: FloatArray) {
         }
 
     var z: Float
+        get() = this[2]
+        set(value) {
+            this[2] = value
+        }
+
+    var r: Float
+        get() = this[0]
+        set(value) {
+            this[0] = value
+        }
+
+    var g: Float
+        get() = this[1]
+        set(value) {
+            this[1] = value
+        }
+
+    var b: Float
         get() = this[2]
         set(value) {
             this[2] = value

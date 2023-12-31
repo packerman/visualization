@@ -1,8 +1,10 @@
 package examples.intro
 
 import framework.core.*
-import framework.core.Attribute.Companion.attribute
 import framework.core.Uniform.Companion.uniform
+import framework.geometry.Geometry
+import framework.geometry.Geometry.Companion.POSITION
+import framework.geometry.geometry
 import framework.math.Vector3
 import web.gl.GLenum
 import web.gl.WebGL2RenderingContext
@@ -30,9 +32,10 @@ class AnimationIntro private constructor(
     }
 
     companion object : Initializer<AnimationIntro> {
+
         private data class VertexArray(
-            val glObject: WebGLVertexArrayObject,
-            val count: Int
+            val id: WebGLVertexArrayObject,
+            val geometry: Geometry
         )
 
         private data class Shape(
@@ -44,8 +47,8 @@ class AnimationIntro private constructor(
             fun render(gl: WebGL2RenderingContext) {
                 program.use(gl)
                 uploadData(gl, program, uniforms)
-                gl.bindVertexArray(vertexArray.glObject)
-                gl.drawArrays(mode, 0, vertexArray.count)
+                gl.bindVertexArray(vertexArray.id)
+                gl.drawArrays(mode, 0, vertexArray.geometry.vertexCount)
             }
         }
 
@@ -74,13 +77,14 @@ class AnimationIntro private constructor(
             )
             program.use(gl)
             val vertexArray = setupVertexArray(
-                gl, program, mapOf(
-                    "a_position" to attribute(
+                gl, program, geometry(gl) {
+                    attribute(
+                        POSITION,
                         arrayOf(
                             0f, 0.2f, 0f, 0.2f, -0.2f, 0f, -0.2f, -0.2f, 0f
                         ), 3
                     )
-                )
+                }
             )
             val translation = uniform(Vector3(-0.5f, 0f, 0f))
             val shapes = listOf(
@@ -97,24 +101,13 @@ class AnimationIntro private constructor(
         private fun setupVertexArray(
             gl: WebGL2RenderingContext,
             program: Program,
-            attributes: Map<String, AttributeInitializer>
+            geometry: Geometry
         ): VertexArray {
             val vertexArray = requireNotNull(gl.createVertexArray()) {
                 "Cannot create vertex array object"
             }
-            for ((name, initializer) in attributes) {
-                gl.bindVertexArray(vertexArray)
-                val attribute = initializer.initialize(gl)
-                attribute.associateLocation(gl, program.getAttribute(name).location)
-            }
-            return VertexArray(
-                vertexArray,
-                attributes.asSequence()
-                    .map { (_, attribute) -> attribute.count }
-                    .distinct()
-                    .single()
-
-            )
+            geometry.buildArray(gl, program)
+            return VertexArray(vertexArray, geometry)
         }
 
         private fun uploadData(gl: WebGL2RenderingContext, program: Program, uniforms: Map<String, Uniform<*>>) {

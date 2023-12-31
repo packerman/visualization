@@ -1,0 +1,34 @@
+package framework.core
+
+import framework.math.Vector3
+import web.gl.WebGL2RenderingContext
+import web.gl.WebGL2RenderingContext.Companion.COLOR_BUFFER_BIT
+import web.gl.WebGL2RenderingContext.Companion.DEPTH_BUFFER_BIT
+import web.gl.WebGL2RenderingContext.Companion.DEPTH_TEST
+
+class Renderer private constructor() {
+
+    fun render(gl: WebGL2RenderingContext, scene: Node<*>, camera: Camera) {
+        gl.clear(COLOR_BUFFER_BIT.toInt() or DEPTH_BUFFER_BIT.toInt())
+        camera.updateViewMatrix()
+
+        val descendants = scene.descendants.toList()
+        console.log("Renderer render ${descendants::class.js}")
+
+        descendants.filterIsInstance<Mesh>().forEach { mesh ->
+            console.log("Render mesh $mesh")
+            mesh.render(gl, camera)
+        }
+    }
+
+    companion object {
+        operator fun invoke(
+            gl: WebGL2RenderingContext,
+            clearColor: Vector3 = Vector3(0f, 0f, 0f)
+        ): Renderer {
+            gl.enable(DEPTH_TEST)
+            gl.clearColor(clearColor.r, clearColor.g, clearColor.b, 1f)
+            return Renderer()
+        }
+    }
+}

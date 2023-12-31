@@ -22,6 +22,15 @@ data class Matrix4 internal constructor(val floats: FloatArray) {
         multiply(floats, floats, other.floats)
     }
 
+    fun preMultiply(other: Matrix4) {
+        multiply(floats, other.floats, floats)
+    }
+
+    fun invert(result: Matrix4): Matrix4 {
+        invert(result.floats, floats)
+        return result
+    }
+
     inline fun forEachIndexed(action: (Int, Float) -> Unit) {
         floats.forEachIndexed(action)
     }
@@ -58,6 +67,17 @@ data class Matrix4 internal constructor(val floats: FloatArray) {
             aspectRatio: Float = 1f,
             near: Float = 0.1f,
             far: Float = 1000f
-        ) = Matrix4(perspectiveNO(FloatArray(16), angleOfView, aspectRatio, near, far))
+        ) = perspective(Matrix4(), angleOfView, aspectRatio, near, far)
+
+        fun perspective(
+            result: Matrix4,
+            angleOfView: Float = toRadians(60f),
+            aspectRatio: Float = 1f,
+            near: Float = 0.1f,
+            far: Float = 1000f
+        ): Matrix4 {
+            perspectiveNO(result.floats, angleOfView, aspectRatio, near, far)
+            return result
+        }
     }
 }

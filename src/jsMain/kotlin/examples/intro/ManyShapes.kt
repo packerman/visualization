@@ -1,7 +1,7 @@
 package examples.intro
 
 import framework.core.Application
-import framework.core.Attribute.Companion.attribute
+import framework.core.Attribute
 import framework.core.Initializer
 import framework.core.Program
 import web.gl.WebGL2RenderingContext
@@ -59,7 +59,7 @@ class ManyShapes(
                 }
                 gl.bindVertexArray(vao)
                 val vertexCount = data.size
-                val attribute = attribute(data).initialize(gl)
+                val attribute = Attribute(gl, data)
                 attribute.associateLocation(gl, program.getAttribute("a_position").location)
                 return Shape(vao, vertexCount)
             }

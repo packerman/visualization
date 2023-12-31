@@ -1,10 +1,10 @@
 package examples.intro
 
 import framework.core.Application
-import framework.core.Attribute.Companion.attribute
-import framework.core.AttributeInitializer
 import framework.core.Initializer
 import framework.core.Program
+import framework.geometry.Geometry
+import framework.geometry.geometry
 import framework.math.Vector3
 import js.core.toTypedArray
 import web.gl.GLenum
@@ -28,14 +28,18 @@ class ColorBuffer(
     }
 
     companion object : Initializer<ColorBuffer> {
+        data class VertexArray(
+            val id: WebGLVertexArrayObject,
+            val geometry: Geometry
+        )
+
         data class Shape(
-            val vertexArray: WebGLVertexArrayObject,
-            val vertexCount: Int,
+            val vertexArray: VertexArray,
             val mode: GLenum
         ) {
             fun render(gl: WebGL2RenderingContext) {
-                gl.bindVertexArray(vertexArray)
-                gl.drawArrays(mode, 0, vertexCount)
+                gl.bindVertexArray(vertexArray.id)
+                gl.drawArrays(mode, 0, vertexArray.geometry.vertexCount)
             }
         }
 
@@ -80,31 +84,34 @@ class ColorBuffer(
             mode: GLenum
         ): (WebGL2RenderingContext, Program) -> Shape {
             return { gl, program ->
-                setupVertexArray(
-                    gl, program,
-                    mapOf(
-                        "a_position" to attribute(
-                            sequenceOf(
-                                Vector3(0.8f, 0f, 0f),
-                                Vector3(0.4f, 0.6f, 0f),
-                                Vector3(-0.4f, 0.6f, 0f),
-                                Vector3(-0.8f, 0f, 0f),
-                                Vector3(-0.4f, -0.6f, 0f),
-                                Vector3(0.4f, -0.6f, 0f)
-                            ).map { it * scale }
-                                .map { it + position }
-                                .toTypedArray()
-                        ),
-                        "a_color" to attribute(
-                            arrayOf(
-                                1f, 0f, 0f,
-                                1f, 0.5f, 0f,
-                                1f, 1f, 0f,
-                                0f, 1f, 0f,
-                                0f, 0f, 1f,
-                                0.5f, 0f, 1f
-                            ), 3
-                        )
+                Shape(
+                    setupVertexArray(
+                        gl, program,
+                        geometry(gl) {
+                            attribute("a_position",
+                                sequenceOf(
+                                    Vector3(0.8f, 0f, 0f),
+                                    Vector3(0.4f, 0.6f, 0f),
+                                    Vector3(-0.4f, 0.6f, 0f),
+                                    Vector3(-0.8f, 0f, 0f),
+                                    Vector3(-0.4f, -0.6f, 0f),
+                                    Vector3(0.4f, -0.6f, 0f)
+                                ).map { it * scale }
+                                    .map { it + position }
+                                    .toTypedArray()
+                            )
+                            attribute(
+                                "a_color",
+                                arrayOf(
+                                    1f, 0f, 0f,
+                                    1f, 0.5f, 0f,
+                                    1f, 1f, 0f,
+                                    0f, 1f, 0f,
+                                    0f, 0f, 1f,
+                                    0.5f, 0f, 1f
+                                ), 3
+                            )
+                        }
                     ),
                     mode
                 )
@@ -114,20 +121,13 @@ class ColorBuffer(
         private fun setupVertexArray(
             gl: WebGL2RenderingContext,
             program: Program,
-            attributes: Map<String, AttributeInitializer>,
-            mode: GLenum
-        ): Shape {
-            val vao = requireNotNull(gl.createVertexArray()) {
+            geometry: Geometry
+        ): VertexArray {
+            val vertexArray = requireNotNull(gl.createVertexArray()) {
                 "Cannot create vertex array object"
             }
-            val vertexCount = mutableSetOf<Int>()
-            for ((name, initializer) in attributes) {
-                gl.bindVertexArray(vao)
-                val attribute = initializer.initialize(gl)
-                vertexCount.add(attribute.count)
-                attribute.associateLocation(gl, program.getAttribute(name).location)
-            }
-            return Shape(vao, vertexCount.single(), mode)
+            geometry.buildArray(gl, program)
+            return VertexArray(vertexArray, geometry)
         }
     }
 }
