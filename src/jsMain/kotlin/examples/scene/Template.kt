@@ -8,7 +8,7 @@ import framework.math.toRadians
 import web.gl.WebGL2RenderingContext
 
 @Suppress("unused")
-class SpinningCube private constructor(
+class Template private constructor(
     private val renderer: Renderer,
     private val scene: Scene,
     private val camera: Camera,
@@ -27,9 +27,9 @@ class SpinningCube private constructor(
         renderer.render(gl, scene, camera)
     }
 
-    companion object : Initializer<SpinningCube> {
+    companion object : Initializer<Template> {
 
-        override fun initialize(gl: WebGL2RenderingContext): SpinningCube {
+        override fun initialize(gl: WebGL2RenderingContext): Template {
             val renderer = Renderer(gl, clearColor = Vector3(0.9f, 0.9f, 0.9f))
             val camera = Camera().apply {
                 position = Vector3(0f, 0f, 2f)
@@ -40,7 +40,7 @@ class SpinningCube private constructor(
             val scene = Scene().apply {
                 add(mesh)
             }
-            return SpinningCube(renderer, scene, camera, mesh)
+            return Template(renderer, scene, camera, mesh)
         }
     }
 }

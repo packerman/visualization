@@ -3,6 +3,7 @@ package framework.geometry
 import framework.core.Attribute
 import framework.core.Index
 import framework.core.Program
+import framework.core.Supplier
 import framework.math.Vector3
 import web.gl.GLenum
 import web.gl.WebGL2RenderingContext
@@ -85,3 +86,6 @@ class GeometryBuilder(private val gl: WebGL2RenderingContext) {
 fun geometry(gl: WebGL2RenderingContext, block: (GeometryBuilder).() -> Unit): Geometry =
     GeometryBuilder(gl).apply(block).build()
 
+fun geometry(block: (GeometryBuilder).() -> Unit): Supplier<Geometry> = { gl ->
+    GeometryBuilder(gl).apply(block).build()
+}

@@ -2,6 +2,9 @@ package framework.core
 
 import framework.core.TransformType.Global
 import framework.core.TransformType.Local
+import framework.geometry.Geometry
+import framework.geometry.Mode
+import framework.material.Material
 import framework.math.Matrix4
 import framework.math.Matrix4.Companion.rotationX
 import framework.math.Matrix4.Companion.rotationY
@@ -10,8 +13,10 @@ import framework.math.Matrix4.Companion.translation
 import framework.math.Vector3
 import framework.math.internal.getTranslation
 import framework.math.internal.setTranslation
+import web.gl.WebGL2RenderingContext
 
 interface Node {
+    val name: String?
     var parent: Node?
     val children: List<Node>
     fun add(child: Node)
@@ -26,9 +31,10 @@ interface Node {
     fun scale(s: Float, type: TransformType = Local)
     var position: Vector3
     val worldPosition: Vector3
+    fun findByName(name: String): Node?
 }
 
-class NodeImpl : Node {
+class NodeImpl(override val name: String? = null) : Node {
 
     override var parent: Node? = null
 
@@ -100,6 +106,19 @@ class NodeImpl : Node {
 
     override val worldPosition: Vector3
         get() = Vector3(getTranslation(FloatArray(3), worldMatrix.floats))
+
+    override fun findByName(name: String): Node? {
+        if (this.name == name) {
+            return this
+        }
+        for (child in children) {
+            val node = child.findByName(name)
+            if (node != null) {
+                return node
+            }
+        }
+        return null
+    }
 }
 
 typealias Scene = NodeImpl
@@ -110,3 +129,33 @@ enum class TransformType {
     Local,
     Global
 }
+
+class NodeBuilder(private val gl: WebGL2RenderingContext, private val built: Node) {
+
+    fun mesh(
+        geometry: Supplier<Geometry>,
+        material: Supplier<Material>,
+        mode: Mode = Mode.Triangles,
+        name: String? = null,
+        block: ((NodeBuilder).() -> Unit)? = null
+    ) {
+        val mesh = Mesh(gl, geometry(gl), material(gl), mode, name)
+        built.add(mesh)
+        if (block != null) {
+            NodeBuilder(gl, mesh).apply(block)
+        }
+    }
+
+    fun translate(x: Float, y: Float, z: Float, type: TransformType = Local) {
+        built.translate(x, y, z, type)
+    }
+
+    fun scale(s: Float, type: TransformType = Local) {
+        built.scale(s, type)
+    }
+
+    fun build(): Node = built
+}
+
+fun scene(gl: WebGL2RenderingContext, block: (NodeBuilder).() -> Unit): Node =
+    NodeBuilder(gl, Group()).apply(block).build()
