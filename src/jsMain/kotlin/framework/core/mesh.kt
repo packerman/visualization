@@ -12,12 +12,11 @@ import web.gl.WebGL2RenderingContext.Companion.ELEMENT_ARRAY_BUFFER
 import web.gl.WebGLVertexArrayObject
 
 class Mesh private constructor(
-    override val node: NodeImpl,
     private val geometry: Geometry,
     private val material: Material,
     private val vertexArray: WebGLVertexArrayObject,
     private val mode: Mode
-) : Node<NodeImpl> by node, WithNode {
+) : Node by NodeImpl() {
 
     var visible: Boolean = true
 
@@ -48,7 +47,14 @@ class Mesh private constructor(
             gl.bindVertexArray(null)
             gl.bindBuffer(ARRAY_BUFFER, null)
             if (geometry.hasIndex) gl.bindBuffer(ELEMENT_ARRAY_BUFFER, null)
-            return Mesh(NodeImpl(), geometry, material, array, mode)
+            return Mesh(geometry, material, array, mode)
         }
     }
 }
+
+fun mesh(
+    gl: WebGL2RenderingContext,
+    geometry: Supplier<Geometry>,
+    material: Supplier<Material>,
+    mode: Mode = Mode.Triangles
+): Mesh = Mesh(gl, geometry(gl), material(gl), mode)

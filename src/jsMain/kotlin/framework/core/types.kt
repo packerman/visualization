@@ -7,3 +7,4 @@ interface Initializer<T> {
 }
 
 typealias Supplier<T> = (gl: WebGL2RenderingContext) -> T
+

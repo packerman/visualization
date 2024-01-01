@@ -8,15 +8,14 @@ import web.gl.WebGL2RenderingContext.Companion.DEPTH_TEST
 
 class Renderer private constructor() {
 
-    fun render(gl: WebGL2RenderingContext, scene: Node<*>, camera: Camera) {
+    fun render(gl: WebGL2RenderingContext, scene: Node, camera: Camera) {
         gl.clear(COLOR_BUFFER_BIT.toInt() or DEPTH_BUFFER_BIT.toInt())
+        camera.aspectRatio = gl.drawingBufferWidth.toFloat() / gl.drawingBufferHeight.toFloat()
         camera.updateViewMatrix()
 
-        val descendants = scene.descendants.toList()
-        console.log("Renderer render ${descendants::class.js}")
+        val descendants = scene.descendants
 
         descendants.filterIsInstance<Mesh>().forEach { mesh ->
-            console.log("Render mesh $mesh")
             mesh.render(gl, camera)
         }
     }

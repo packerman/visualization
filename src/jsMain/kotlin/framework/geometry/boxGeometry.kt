@@ -1,10 +1,10 @@
 package framework.geometry
 
+import framework.core.Supplier
 import framework.geometry.Geometry.Companion.COLOR
 import framework.geometry.Geometry.Companion.POSITION
-import web.gl.WebGL2RenderingContext
 
-fun boxGeometry(gl: WebGL2RenderingContext, width: Float = 1f, height: Float = 1f, depth: Float = 1f): Geometry {
+fun boxGeometry(width: Float = 1f, height: Float = 1f, depth: Float = 1f): Supplier<Geometry> = { gl ->
     val p = arrayOf(
         arrayOf(-width / 2, -height / 2, -depth / 2),
         arrayOf(width / 2, -height / 2, -depth / 2),
@@ -23,7 +23,7 @@ fun boxGeometry(gl: WebGL2RenderingContext, width: Float = 1f, height: Float = 1
         arrayOf(0.5f, 0.5f, 1f),
         arrayOf(0f, 0f, 0.5f)
     )
-    return geometry(gl) {
+    geometry(gl) {
         attribute(POSITION, listOf(
             5, 1, 3, 5, 3, 7,
             0, 4, 6, 0, 6, 2,

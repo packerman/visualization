@@ -1,5 +1,6 @@
 package framework.material
 
+import framework.core.Supplier
 import framework.core.uniformMap
 import framework.math.Vector3
 import web.gl.WebGL2RenderingContext
@@ -19,16 +20,14 @@ class BasicMaterial private constructor(private val material: Material) : Materi
         }
 
     companion object {
-        operator fun invoke(gl: WebGL2RenderingContext): BasicMaterial {
-            return BasicMaterial(
-                MaterialImpl(
-                    gl, VERTEX_SHADER, FRAGMENT_SHADER, uniformMap {
-                        uniform(BASE_COLOR, Vector3(1f, 1f, 1f))
-                        uniform(USE_VERTEX_COLORS, true)
-                    }
-                )
+        operator fun invoke(gl: WebGL2RenderingContext): BasicMaterial = BasicMaterial(
+            MaterialImpl(
+                gl, VERTEX_SHADER, FRAGMENT_SHADER, uniformMap {
+                    uniform(BASE_COLOR, Vector3(1f, 1f, 1f))
+                    uniform(USE_VERTEX_COLORS, true)
+                }
             )
-        }
+        )
 
         private const val BASE_COLOR = "u_BaseColor"
         private const val USE_VERTEX_COLORS = "u_UseVertexColor"
@@ -66,4 +65,8 @@ class BasicMaterial private constructor(private val material: Material) : Materi
     }
 """
     }
+}
+
+fun basicMaterial(block: (BasicMaterial).() -> Unit): Supplier<BasicMaterial> = { gl ->
+    BasicMaterial(gl).apply(block)
 }

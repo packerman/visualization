@@ -11,12 +11,13 @@ import framework.math.Vector3
 import framework.math.internal.getTranslation
 import framework.math.internal.setTranslation
 
-interface Node<N : Node<N>> {
-    val children: List<Node<*>>
-    fun addChild(child: N)
-    fun removeChild(child: N)
+interface Node {
+    var parent: Node?
+    val children: List<Node>
+    fun add(child: Node)
+    fun remove(child: Node)
     val worldMatrix: Matrix4
-    val descendants: Sequence<Node<*>>
+    val descendants: Sequence<Node>
     fun applyMatrix(matrix: Matrix4, type: TransformType = Local)
     fun translate(x: Float, y: Float, z: Float, type: TransformType = Local)
     fun rotateX(angle: Float, type: TransformType = Local)
@@ -27,29 +28,22 @@ interface Node<N : Node<N>> {
     val worldPosition: Vector3
 }
 
-fun <N : WithNode> Node<NodeImpl>.add(child: N) {
-    this.addChild(child.node)
-}
+class NodeImpl : Node {
 
-fun <N : WithNode> Node<NodeImpl>.remove(child: N) {
-    this.removeChild(child.node)
-}
-
-class NodeImpl : Node<NodeImpl> {
+    override var parent: Node? = null
 
     private val transform: Matrix4 = Matrix4.identity()
-    private var parent: Node<*>? = null
-    private val _children: MutableList<Node<*>> = mutableListOf()
+    private val _children: MutableList<Node> = mutableListOf()
 
-    override val children: List<Node<*>>
+    override val children: List<Node>
         get() = _children
 
-    override fun addChild(child: NodeImpl) {
+    override fun add(child: Node) {
         _children.add(child)
         child.parent = this
     }
 
-    override fun removeChild(child: NodeImpl) {
+    override fun remove(child: Node) {
         _children.remove(child)
         child.parent = null
     }
@@ -60,9 +54,9 @@ class NodeImpl : Node<NodeImpl> {
             return if (parent == null) transform else parent.worldMatrix * transform
         }
 
-    override val descendants: Sequence<Node<*>>
+    override val descendants: Sequence<Node>
         get() = sequence {
-            val toProcess = ArrayDeque<Node<*>>()
+            val toProcess = ArrayDeque<Node>()
             toProcess.addLast(this@NodeImpl)
             while (toProcess.isNotEmpty()) {
                 val node = toProcess.removeFirst()
@@ -115,8 +109,4 @@ typealias Group = NodeImpl
 enum class TransformType {
     Local,
     Global
-}
-
-interface WithNode {
-    val node: NodeImpl
 }

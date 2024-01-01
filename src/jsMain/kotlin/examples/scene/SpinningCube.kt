@@ -2,8 +2,9 @@ package examples.scene
 
 import framework.core.*
 import framework.geometry.boxGeometry
-import framework.material.BasicMaterial
+import framework.material.basicMaterial
 import framework.math.Vector3
+import framework.math.toRadians
 import web.gl.WebGL2RenderingContext
 
 @Suppress("unused")
@@ -14,9 +15,12 @@ class SpinningCube private constructor(
     private val mesh: Mesh
 ) : Application {
 
+    val yRotateSpeed = toRadians(120f)
+    val xRotateSpeed = toRadians(90f)
+
     override fun update(elapsed: Double, keyState: KeyState) {
-        mesh.rotateY(0.0514f)
-        mesh.rotateX(0.0337f)
+        mesh.rotateY(elapsed.toFloat() * yRotateSpeed / 1000f)
+        mesh.rotateX(elapsed.toFloat() * xRotateSpeed / 1000f)
     }
 
     override fun render(gl: WebGL2RenderingContext) {
@@ -29,11 +33,12 @@ class SpinningCube private constructor(
             val renderer = Renderer(gl, clearColor = Vector3(0.9f, 0.9f, 0.9f))
             val scene = NodeImpl()
             val camera = Camera()
-            camera.position = Vector3(0f, 0f, 4f)
+            camera.position = Vector3(0f, 0f, 2f)
 
-            val mesh = Mesh(gl, boxGeometry(gl), BasicMaterial(gl).apply {
+            val mesh = mesh(gl, boxGeometry(), basicMaterial {
                 useVertexColors = true
             })
+
             scene.add(mesh)
 
             return SpinningCube(renderer, scene, camera, mesh)

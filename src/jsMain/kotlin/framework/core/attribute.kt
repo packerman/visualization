@@ -7,19 +7,6 @@ import web.gl.WebGL2RenderingContext.Companion.ARRAY_BUFFER
 import web.gl.WebGL2RenderingContext.Companion.FLOAT
 import web.gl.WebGL2RenderingContext.Companion.STATIC_DRAW
 
-class AttributeInitializer(private val srcData: Float32List, private val size: Int) : Initializer<Attribute> {
-
-    override fun initialize(gl: WebGL2RenderingContext): Attribute {
-        val buffer = requireNotNull(gl.createBuffer())
-        val attribute = Attribute(buffer, srcData, size, FLOAT)
-        attribute.uploadData(gl)
-        return attribute
-    }
-
-    val count: Int
-        get() = srcData.length / size
-}
-
 class Attribute(
     private val buffer: WebGLBuffer,
     private val srcData: Float32List,
