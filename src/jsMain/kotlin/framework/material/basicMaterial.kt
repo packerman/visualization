@@ -24,13 +24,15 @@ class BasicMaterial private constructor(private val material: Material) : Materi
             gl: WebGL2RenderingContext,
             baseColor: Vector3,
             useVertexColors: Boolean,
-            pointSize: Float
+            pointSize: Float,
+            doubleSided: Boolean
         ): BasicMaterial = BasicMaterial(
             MaterialImpl(
                 gl, vertexShader(pointSize), FRAGMENT_SHADER, uniformMap {
                     uniform(BASE_COLOR, baseColor)
                     uniform(USE_VERTEX_COLORS, useVertexColors)
-                }
+                },
+                doubleSided
             )
         )
 
@@ -77,7 +79,8 @@ class BasicMaterial private constructor(private val material: Material) : Materi
 fun basicMaterial(
     baseColor: Vector3 = Vector3(1f, 1f, 1f),
     useVertexColors: Boolean = false,
-    pointSize: Float = 1f
+    pointSize: Float = 1f,
+    doubleSided: Boolean = false
 ): Supplier<BasicMaterial> = { gl ->
-    BasicMaterial(gl, baseColor, useVertexColors, pointSize)
+    BasicMaterial(gl, baseColor, useVertexColors, pointSize, doubleSided)
 }

@@ -5,6 +5,7 @@ import framework.core.Uniform
 import framework.core.Uniform.Companion.uniform
 import framework.math.Matrix4
 import web.gl.WebGL2RenderingContext
+import web.gl.WebGL2RenderingContext.Companion.CULL_FACE
 
 interface Material {
     val program: Program
@@ -16,7 +17,8 @@ interface Material {
 
 class MaterialImpl private constructor(
     override val program: Program,
-    private val uniforms: Map<String, Uniform<*>>
+    private val uniforms: Map<String, Uniform<*>> = mapOf(),
+    private val doubleSided: Boolean = false
 ) : Material {
 
     @Suppress("unchecked_cast")
@@ -37,6 +39,11 @@ class MaterialImpl private constructor(
     }
 
     override fun updateRenderSettings(gl: WebGL2RenderingContext) {
+        if (doubleSided) {
+            gl.disable(CULL_FACE)
+        } else {
+            gl.enable(CULL_FACE)
+        }
     }
 
     companion object {
@@ -48,7 +55,8 @@ class MaterialImpl private constructor(
             gl: WebGL2RenderingContext,
             vertexShaderSource: String,
             fragmentShaderSource: String,
-            uniforms: Map<String, Uniform<*>>
+            uniforms: Map<String, Uniform<*>> = mapOf(),
+            doubleSided: Boolean = false
         ): Material {
             val program = Program.build(gl, vertexShaderSource, fragmentShaderSource)
             val allUniforms: MutableMap<String, Uniform<*>> = mutableMapOf(
@@ -57,7 +65,7 @@ class MaterialImpl private constructor(
                 PROJECTION_MATRIX to uniform(Matrix4())
             )
             allUniforms.putAll(uniforms)
-            return MaterialImpl(program, allUniforms)
+            return MaterialImpl(program, allUniforms, doubleSided)
         }
     }
 }
