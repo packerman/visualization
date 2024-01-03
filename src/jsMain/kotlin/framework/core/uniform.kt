@@ -15,6 +15,10 @@ sealed class Uniform<T>(var data: T, val dataType: GLenum) {
 
     abstract fun uploadData(gl: WebGL2RenderingContext, location: WebGLUniformLocation?)
 
+    override fun toString(): String {
+        return "Uniform(data=$data, dataType=$dataType)"
+    }
+
     companion object {
         fun uniform(data: Boolean): Uniform<Boolean> = BooleanUniform(data)
 

@@ -15,8 +15,8 @@ class SpinningCube private constructor(
     private val mesh: Mesh
 ) : Application {
 
-    val yRotateSpeed = toRadians(120f)
-    val xRotateSpeed = toRadians(90f)
+    private val yRotateSpeed = toRadians(120f)
+    private val xRotateSpeed = toRadians(90f)
 
     override fun update(elapsed: Double, keyState: KeyState) {
         mesh.rotateY(elapsed.toFloat() * yRotateSpeed / 1000f)
@@ -34,9 +34,11 @@ class SpinningCube private constructor(
             val camera = Camera().apply {
                 position = Vector3(0f, 0f, 2f)
             }
-            val mesh = mesh(gl, boxGeometry(), basicMaterial {
-                useVertexColors = true
-            })
+            val mesh = mesh(
+                gl, boxGeometry(), basicMaterial(
+                    useVertexColors = true
+                )
+            )
             val scene = Scene().apply {
                 add(mesh)
             }

@@ -34,9 +34,11 @@ class Template private constructor(
             val camera = Camera().apply {
                 position = Vector3(0f, 0f, 2f)
             }
-            val mesh = mesh(gl, boxGeometry(), basicMaterial {
-                useVertexColors = true
-            })
+            val mesh = mesh(
+                gl, boxGeometry(), basicMaterial(
+                    useVertexColors = true
+                )
+            )
             val scene = Scene().apply {
                 add(mesh)
             }

@@ -7,11 +7,22 @@ import framework.core.Supplier
 import framework.math.Vector3
 import web.gl.GLenum
 import web.gl.WebGL2RenderingContext
+import web.gl.WebGL2RenderingContext.Companion.LINES
+import web.gl.WebGL2RenderingContext.Companion.LINE_LOOP
+import web.gl.WebGL2RenderingContext.Companion.LINE_STRIP
+import web.gl.WebGL2RenderingContext.Companion.POINTS
+import web.gl.WebGL2RenderingContext.Companion.TRIANGLES
+import web.gl.WebGL2RenderingContext.Companion.TRIANGLE_FAN
+import web.gl.WebGL2RenderingContext.Companion.TRIANGLE_STRIP
 
 enum class Mode(val value: GLenum) {
-    Points(WebGL2RenderingContext.POINTS),
-    Lines(WebGL2RenderingContext.LINES),
-    Triangles(WebGL2RenderingContext.TRIANGLES)
+    Points(POINTS),
+    Lines(LINES),
+    LineStrip(LINE_STRIP),
+    LineLoop(LINE_LOOP),
+    Triangles(TRIANGLES),
+    TriangleStrip(TRIANGLE_STRIP),
+    TriangleFan(TRIANGLE_FAN),
 }
 
 class Geometry(

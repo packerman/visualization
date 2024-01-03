@@ -20,11 +20,16 @@ class BasicMaterial private constructor(private val material: Material) : Materi
         }
 
     companion object {
-        operator fun invoke(gl: WebGL2RenderingContext): BasicMaterial = BasicMaterial(
+        operator fun invoke(
+            gl: WebGL2RenderingContext,
+            baseColor: Vector3,
+            useVertexColors: Boolean,
+            pointSize: Float
+        ): BasicMaterial = BasicMaterial(
             MaterialImpl(
-                gl, VERTEX_SHADER, FRAGMENT_SHADER, uniformMap {
-                    uniform(BASE_COLOR, Vector3(1f, 1f, 1f))
-                    uniform(USE_VERTEX_COLORS, true)
+                gl, vertexShader(pointSize), FRAGMENT_SHADER, uniformMap {
+                    uniform(BASE_COLOR, baseColor)
+                    uniform(USE_VERTEX_COLORS, useVertexColors)
                 }
             )
         )
@@ -32,7 +37,7 @@ class BasicMaterial private constructor(private val material: Material) : Materi
         private const val BASE_COLOR = "u_BaseColor"
         private const val USE_VERTEX_COLORS = "u_UseVertexColor"
 
-        private const val VERTEX_SHADER = """
+        private fun vertexShader(pointSize: Float) = """
     in vec4 a_position;
     in vec4 a_color;
     
@@ -43,12 +48,14 @@ class BasicMaterial private constructor(private val material: Material) : Materi
     out vec4 v_Color;
     
     void main() {
+        gl_PointSize = float($pointSize);
         gl_Position = u_ProjectionMatrix * u_ViewMatrix * u_ModelMatrix * a_position;
         v_Color = a_color;
     }
 """
 
-        private const val FRAGMENT_SHADER = """
+        private const
+        val FRAGMENT_SHADER = """
     in vec4 v_Color;
     
     uniform vec3 u_BaseColor;
@@ -67,6 +74,10 @@ class BasicMaterial private constructor(private val material: Material) : Materi
     }
 }
 
-fun basicMaterial(block: (BasicMaterial).() -> Unit): Supplier<BasicMaterial> = { gl ->
-    BasicMaterial(gl).apply(block)
+fun basicMaterial(
+    baseColor: Vector3 = Vector3(1f, 1f, 1f),
+    useVertexColors: Boolean = false,
+    pointSize: Float = 1f
+): Supplier<BasicMaterial> = { gl ->
+    BasicMaterial(gl, baseColor, useVertexColors, pointSize)
 }

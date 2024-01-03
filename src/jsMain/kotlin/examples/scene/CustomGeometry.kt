@@ -27,33 +27,35 @@ class CustomGeometry private constructor(
                 position = Vector3(0f, 0f, 1f)
             }
             val scene = scene(gl) {
-                mesh(geometry {
-                    attribute(
-                        POSITION, listOf(
-                            arrayOf(-0.1f, 0.1f, 0f),
-                            arrayOf(0f, 0f, 0f),
-                            arrayOf(0.1f, 0.1f, 0f),
-                            arrayOf(-0.2f, -0.2f, 0f),
-                            arrayOf(0.2f, -0.2f, 0f)
+                mesh(
+                    geometry {
+                        attribute(
+                            POSITION, listOf(
+                                arrayOf(-0.1f, 0.1f, 0f),
+                                arrayOf(0f, 0f, 0f),
+                                arrayOf(0.1f, 0.1f, 0f),
+                                arrayOf(-0.2f, -0.2f, 0f),
+                                arrayOf(0.2f, -0.2f, 0f)
+                            )
                         )
-                    )
-                    attribute(
-                        COLOR, listOf(
-                            arrayOf(1f, 0f, 0f),
-                            arrayOf(1f, 1f, 0f),
-                            arrayOf(1f, 0f, 0f),
-                            arrayOf(0f, 0.25f, 0f),
-                            arrayOf(0f, 0.25f, 0f),
+                        attribute(
+                            COLOR, listOf(
+                                arrayOf(1f, 0f, 0f),
+                                arrayOf(1f, 1f, 0f),
+                                arrayOf(1f, 0f, 0f),
+                                arrayOf(0f, 0.25f, 0f),
+                                arrayOf(0f, 0.25f, 0f),
+                            )
                         )
-                    )
-                    index(
-                        arrayOf(
-                            0, 1, 3, 1, 3, 4, 1, 4, 2
+                        index(
+                            arrayOf(
+                                0, 1, 3, 1, 3, 4, 1, 4, 2
+                            )
                         )
+                    }, basicMaterial(
+                        useVertexColors = true
                     )
-                }, basicMaterial {
-                    useVertexColors = true
-                }) {
+                ) {
                     scale(3f)
                     translate(0f, 0.05f, 0f)
                 }
