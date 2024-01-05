@@ -131,7 +131,7 @@ class MoveTriangle private constructor(
                     program: Program,
                     uniforms: Map<String, Uniform<*>>
                 ): List<Pair<Uniform<*>, WebGLUniformLocation?>> =
-                    uniforms.map { (name, uniform) -> uniform to program.getUniform(name).location }
+                    uniforms.map { (name, uniform) -> uniform to program.getUniform(name)!!.location }
             }
         }
 

@@ -33,8 +33,9 @@ class MaterialImpl private constructor(
 
     override fun uploadData(gl: WebGL2RenderingContext) {
         for ((name, uniform) in uniforms) {
-            val location = program.getUniform(name).location
-            uniform.uploadData(gl, location)
+            program.getUniform(name)?.let { active ->
+                uniform.uploadData(gl, active.location)
+            }
         }
     }
 

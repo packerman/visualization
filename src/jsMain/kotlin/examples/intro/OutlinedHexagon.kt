@@ -52,7 +52,7 @@ class OutlinedHexagon(
             )
             val vertexCount = positionData.size
             val positionAttribute = Attribute(gl, positionData)
-            positionAttribute.associateLocation(gl, program.getAttribute("a_position").location)
+            positionAttribute.associateLocation(gl, program.getAttribute("a_position")!!.location)
             return OutlinedHexagon(program, vao, vertexCount)
         }
     }

@@ -12,9 +12,9 @@ class Program(
         gl.useProgram(program)
     }
 
-    fun getAttribute(name: String): ActiveAttribute = attributes.getValue(name)
+    fun getAttribute(name: String): ActiveAttribute? = attributes[name]
 
-    fun getUniform(name: String): ActiveUniform = uniforms.getValue(name)
+    fun getUniform(name: String): ActiveUniform? = uniforms[name]
 
     companion object {
         data class ActiveAttribute(val location: GLint, val type: GLenum)

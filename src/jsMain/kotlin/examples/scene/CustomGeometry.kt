@@ -1,7 +1,7 @@
 package examples.scene
 
 import framework.core.*
-import framework.geometry.Geometry.Companion.COLOR
+import framework.geometry.Geometry.Companion.COLOR_0
 import framework.geometry.Geometry.Companion.POSITION
 import framework.geometry.geometry
 import framework.material.basicMaterial
@@ -39,7 +39,7 @@ class CustomGeometry private constructor(
                             )
                         )
                         attribute(
-                            COLOR, listOf(
+                            COLOR_0, listOf(
                                 arrayOf(1f, 0f, 0f),
                                 arrayOf(1f, 1f, 0f),
                                 arrayOf(1f, 0f, 0f),

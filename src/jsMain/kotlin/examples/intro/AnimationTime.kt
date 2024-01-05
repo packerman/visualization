@@ -112,7 +112,9 @@ class AnimationTime private constructor(
 
         private fun uploadData(gl: WebGL2RenderingContext, program: Program, uniforms: Map<String, Uniform<*>>) {
             for ((name, uniform) in uniforms) {
-                uniform.uploadData(gl, program.getUniform(name).location)
+                program.getUniform(name)?.let { active ->
+                    uniform.uploadData(gl, active.location)
+                }
             }
         }
     }

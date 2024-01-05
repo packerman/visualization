@@ -50,14 +50,14 @@ class ColorBuffer(
                 gl,
                 """
                     in vec3 a_position;
-                    in vec3 a_color;
+                    in vec3 a_color_0;
                     
                     out vec3 v_Color;
                     
                     void main() {
                         gl_PointSize = 5.0;
                         gl_Position = vec4(a_position, 1.0);
-                        v_Color = a_color;
+                        v_Color = a_color_0;
                     }
                 """,
                 """
@@ -101,7 +101,7 @@ class ColorBuffer(
                                     .toTypedArray()
                             )
                             attribute(
-                                "a_color",
+                                "a_color_0",
                                 arrayOf(
                                     1f, 0f, 0f,
                                     1f, 0.5f, 0f,

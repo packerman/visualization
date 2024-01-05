@@ -60,7 +60,7 @@ class ManyShapes(
                 gl.bindVertexArray(vao)
                 val vertexCount = data.size
                 val attribute = Attribute(gl, data)
-                attribute.associateLocation(gl, program.getAttribute("a_position").location)
+                attribute.associateLocation(gl, program.getAttribute("a_position")!!.location)
                 return Shape(vao, vertexCount)
             }
 

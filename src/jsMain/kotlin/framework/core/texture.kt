@@ -60,14 +60,21 @@ class Texture private constructor(
         gl.texParameteri(TEXTURE_2D, TEXTURE_WRAP_T, wrap.value)
     }
 
+    fun getSampler2D(textureUnit: Int) = Sampler2D(texture, textureUnit)
+
     companion object {
         private val INITIAL_DATA = Uint8Array(arrayOf(0, 0, 0, 0))
 
-        operator fun invoke(gl: WebGL2RenderingContext, source: TexImageSource): Texture {
+        operator fun invoke(
+            gl: WebGL2RenderingContext, source: TexImageSource,
+            magFilter: MagFilter = MagFilter.Linear,
+            minFilter: MinFilter = MinFilter.NearestMipMapLinear,
+            wrap: Wrap = Wrap.Repeat
+        ): Texture {
             val texture = gl.createTexture()
             gl.bindTexture(TEXTURE_2D, texture)
             gl.texImage2D(TEXTURE_2D, 0, RGBA, 1, 1, 0, RGBA, UNSIGNED_BYTE, INITIAL_DATA)
-            return Texture(texture, source)
+            return Texture(texture, source, magFilter, minFilter, wrap)
         }
 
         fun load(
@@ -75,11 +82,11 @@ class Texture private constructor(
             magFilter: MagFilter = MagFilter.Linear,
             minFilter: MinFilter = MinFilter.NearestMipMapLinear,
             wrap: Wrap = Wrap.Repeat
-        ) {
+        ): Texture {
             val image = Image().apply {
                 src = addressOrUrl
             }
-            val texture = Texture(gl, image)
+            val texture = Texture(gl, image, magFilter, minFilter, wrap)
             image.onload = {
                 texture.uploadData(gl)
                 console.log("Loaded image $addressOrUrl")
@@ -87,6 +94,18 @@ class Texture private constructor(
             image.onerror = {
                 console.error("Error while loading image $addressOrUrl")
             }
+            return texture
         }
     }
+}
+
+data class Sampler2D(val texture: WebGLTexture?, val textureUnit: Int)
+
+fun loadTexture(
+    addressOrUrl: String,
+    magFilter: MagFilter = MagFilter.Linear,
+    minFilter: MinFilter = MinFilter.NearestMipMapLinear,
+    wrap: Wrap = Wrap.Repeat
+): Supplier<Texture> = { gl ->
+    Texture.load(gl, addressOrUrl, magFilter, minFilter, wrap)
 }

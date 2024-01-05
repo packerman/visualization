@@ -41,7 +41,7 @@ class BasicMaterial private constructor(private val material: Material) : Materi
 
         private fun vertexShader(pointSize: Float) = """
     in vec4 a_position;
-    in vec4 a_color;
+    in vec4 a_color_0;
     
     uniform mat4 u_ProjectionMatrix;
     uniform mat4 u_ViewMatrix;
@@ -52,12 +52,11 @@ class BasicMaterial private constructor(private val material: Material) : Materi
     void main() {
         gl_PointSize = float($pointSize);
         gl_Position = u_ProjectionMatrix * u_ViewMatrix * u_ModelMatrix * a_position;
-        v_Color = a_color;
+        v_Color = a_color_0;
     }
 """
 
-        private const
-        val FRAGMENT_SHADER = """
+        private const val FRAGMENT_SHADER = """
     in vec4 v_Color;
     
     uniform vec3 u_BaseColor;

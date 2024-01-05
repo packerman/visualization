@@ -34,7 +34,9 @@ class Geometry(
     fun buildArray(gl: WebGL2RenderingContext, program: Program) {
         for ((name, attribute) in attributes) {
             attribute.uploadData(gl)
-            attribute.associateLocation(gl, program.getAttribute(name).location)
+            program.getAttribute(name)?.let { active ->
+                attribute.associateLocation(gl, active.location)
+            }
         }
         index?.bind(gl)
     }
@@ -52,7 +54,8 @@ class Geometry(
 
     companion object {
         const val POSITION = "a_position"
-        const val COLOR = "a_color"
+        const val COLOR_0 = "a_color_0"
+        const val TEXCOORD_0 = "a_texcoord_0";
 
         operator fun invoke(attributes: Map<String, Attribute>, index: Index?): Geometry {
             val vertexCount = attributes.asSequence()
