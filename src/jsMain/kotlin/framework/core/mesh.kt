@@ -46,7 +46,7 @@ class Mesh private constructor(
             ): Mesh {
             val array = requireNotNull(gl.createVertexArray())
             gl.bindVertexArray(array)
-            geometry.buildArray(gl, material.program)
+            geometry.buildVertexArray(gl, material.program)
             gl.bindVertexArray(null)
             gl.bindBuffer(ARRAY_BUFFER, null)
             if (geometry.hasIndex) gl.bindBuffer(ELEMENT_ARRAY_BUFFER, null)

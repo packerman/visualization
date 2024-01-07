@@ -8,6 +8,7 @@ import web.gl.WebGL2RenderingContext.Companion.DEPTH_BUFFER_BIT
 import web.gl.WebGL2RenderingContext.Companion.DEPTH_TEST
 import web.gl.WebGL2RenderingContext.Companion.ONE_MINUS_SRC_ALPHA
 import web.gl.WebGL2RenderingContext.Companion.SRC_ALPHA
+import web.gl.WebGL2RenderingContext.Companion.UNPACK_FLIP_Y_WEBGL
 
 class Renderer private constructor() {
 
@@ -32,6 +33,7 @@ class Renderer private constructor() {
             gl.clearColor(clearColor.r, clearColor.g, clearColor.b, 1f)
             gl.enable(BLEND)
             gl.blendFunc(SRC_ALPHA, ONE_MINUS_SRC_ALPHA)
+            gl.pixelStorei(UNPACK_FLIP_Y_WEBGL, 1)
             return Renderer()
         }
     }

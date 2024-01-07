@@ -5,6 +5,7 @@ import framework.core.TransformType.Local
 import framework.geometry.Geometry
 import framework.geometry.Mode
 import framework.material.Material
+import framework.math.Matrix3
 import framework.math.Matrix4
 import framework.math.Matrix4.Companion.rotationX
 import framework.math.Matrix4.Companion.rotationY
@@ -31,6 +32,8 @@ interface Node {
     fun scale(s: Float, type: TransformType = Local)
     var position: Vector3
     val worldPosition: Vector3
+    val rotationMatrix: Matrix3
+    var direction: Vector3
     fun findByName(name: String): Node?
 }
 
@@ -106,6 +109,13 @@ class NodeImpl(override val name: String? = null) : Node {
 
     override val worldPosition: Vector3
         get() = Vector3(getTranslation(FloatArray(3), worldMatrix.floats))
+
+    override val rotationMatrix: Matrix3
+        get() = Matrix3.fromMatrix4(transform)
+
+    override var direction: Vector3
+        get() = rotationMatrix * Vector3(0f, 0f, -1f)
+        set(value) {}
 
     override fun findByName(name: String): Node? {
         if (this.name == name) {

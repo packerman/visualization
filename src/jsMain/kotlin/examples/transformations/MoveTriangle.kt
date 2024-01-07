@@ -1,7 +1,7 @@
 package examples.transformations
 
 import framework.core.*
-import framework.core.Uniform.Companion.uniform
+import framework.core.BasicUniform.Companion.uniform
 import framework.geometry.Geometry
 import framework.geometry.Geometry.Companion.POSITION
 import framework.geometry.geometry
@@ -20,7 +20,7 @@ import web.gl.WebGLVertexArrayObject
 class MoveTriangle private constructor(
     private val program: Program,
     private val shapes: List<Shape>,
-    private val modelMatrix: Uniform<Matrix4>
+    private val modelMatrix: BasicUniform<Matrix4>
 ) : Application {
 
     private val moveSpeed = 0.5f
@@ -93,7 +93,7 @@ class MoveTriangle private constructor(
         private data class Shape(
             val program: Program,
             val vertexArray: VertexArray,
-            val uniforms: List<Pair<Uniform<*>, WebGLUniformLocation?>>,
+            val uniforms: List<Pair<BasicUniform<*>, WebGLUniformLocation?>>,
             val mode: GLenum
         ) {
             fun render(gl: WebGL2RenderingContext) {
@@ -107,7 +107,7 @@ class MoveTriangle private constructor(
                 fun create(
                     program: Program,
                     vertexArray: VertexArray,
-                    uniforms: Map<String, Uniform<*>>,
+                    uniforms: Map<String, BasicUniform<*>>,
                     mode: GLenum
                 ): Shape {
                     return Shape(
@@ -120,7 +120,7 @@ class MoveTriangle private constructor(
 
                 private fun uploadData(
                     gl: WebGL2RenderingContext,
-                    uniformLocations: List<Pair<Uniform<*>, WebGLUniformLocation?>>
+                    uniformLocations: List<Pair<BasicUniform<*>, WebGLUniformLocation?>>
                 ) {
                     for ((uniform, location) in uniformLocations) {
                         uniform.uploadData(gl, location)
@@ -129,8 +129,8 @@ class MoveTriangle private constructor(
 
                 private fun associateUniforms(
                     program: Program,
-                    uniforms: Map<String, Uniform<*>>
-                ): List<Pair<Uniform<*>, WebGLUniformLocation?>> =
+                    uniforms: Map<String, BasicUniform<*>>
+                ): List<Pair<BasicUniform<*>, WebGLUniformLocation?>> =
                     uniforms.map { (name, uniform) -> uniform to program.getUniform(name)!!.location }
             }
         }
@@ -192,7 +192,7 @@ class MoveTriangle private constructor(
             val vertexArray = requireNotNull(gl.createVertexArray()) {
                 "Cannot create vertex array object"
             }
-            geometry.buildArray(gl, program)
+            geometry.buildVertexArray(gl, program)
             return VertexArray(vertexArray, geometry)
         }
     }

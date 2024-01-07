@@ -1,8 +1,8 @@
 package framework.math.internal
 
-import kotlin.math.cos
-import kotlin.math.sin
-import kotlin.math.tan
+import kotlin.math.*
+
+private const val EPSILON = 0.000001f
 
 internal fun identity(out: FloatArray): FloatArray {
     out[0] = 1f
@@ -307,6 +307,84 @@ internal fun setTranslation(out: FloatArray, v: FloatArray): FloatArray {
     out[12] = v[0]
     out[13] = v[1]
     out[14] = v[2]
+
+    return out
+}
+
+internal fun lookAt(out: FloatArray, eye: FloatArray, center: FloatArray, up: FloatArray): FloatArray {
+    val eyeX = eye[0]
+    val eyeY = eye[1]
+    val eyeZ = eye[2]
+    val upx = up[0]
+    val upy = up[1]
+    val upz = up[2]
+    val centerX = center[0]
+    val centerY = center[1]
+    val centerZ = center[2]
+
+    if (abs((eyeX - centerX).toDouble()) < EPSILON && abs((eyeY - centerY).toDouble()) < EPSILON && abs(
+            (eyeZ - centerZ).toDouble()
+        ) < EPSILON
+    ) {
+        return identity(out)
+    }
+
+    var z0 = eyeX - centerX
+    var z1 = eyeY - centerY
+    var z2 = eyeZ - centerZ
+
+    var len = 1 / sqrt(z0 * z0 + z1 * z1 + z2 * z2)
+    z0 *= len
+    z1 *= len
+    z2 *= len
+
+    var x0 = upy * z2 - upz * z1
+    var x1 = upz * z0 - upx * z2
+    var x2 = upx * z1 - upy * z0
+    len = sqrt(x0 * x0 + x1 * x1 + x2 * x2)
+    if (len == 0f) {
+        x0 = 0f
+        x1 = 0f
+        x2 = 0f
+    } else {
+        len = 1 / len
+        x0 *= len
+        x1 *= len
+        x2 *= len
+    }
+
+    var y0 = z1 * x2 - z2 * x1
+    var y1 = z2 * x0 - z0 * x2
+    var y2 = z0 * x1 - z1 * x0
+
+    len = sqrt(y0 * y0 + y1 * y1 + y2 * y2)
+    if (len == 0f) {
+        y0 = 0f
+        y1 = 0f
+        y2 = 0f
+    } else {
+        len = 1 / len
+        y0 *= len
+        y1 *= len
+        y2 *= len
+    }
+
+    out[0] = x0
+    out[1] = y0
+    out[2] = z0
+    out[3] = 0f
+    out[4] = x1
+    out[5] = y1
+    out[6] = z1
+    out[7] = 0f
+    out[8] = x2
+    out[9] = y2
+    out[10] = z2
+    out[11] = 0f
+    out[12] = -(x0 * eyeX + x1 * eyeY + x2 * eyeZ)
+    out[13] = -(y0 * eyeX + y1 * eyeY + y2 * eyeZ)
+    out[14] = -(z0 * eyeX + z1 * eyeY + z2 * eyeZ)
+    out[15] = 1f
 
     return out
 }

@@ -1,10 +1,10 @@
 package examples.intro
 
 import framework.core.Application
+import framework.core.BasicUniform
+import framework.core.BasicUniform.Companion.uniform
 import framework.core.Initializer
 import framework.core.Program
-import framework.core.Uniform
-import framework.core.Uniform.Companion.uniform
 import framework.geometry.Geometry
 import framework.geometry.geometry
 import framework.math.Vector3
@@ -36,7 +36,7 @@ class UniformIntro private constructor(
         private data class Shape(
             val program: Program,
             val vertexArray: VertexArray,
-            val uniforms: List<Pair<Uniform<*>, WebGLUniformLocation?>>,
+            val uniforms: List<Pair<BasicUniform<*>, WebGLUniformLocation?>>,
             val mode: GLenum
         ) {
             fun render(gl: WebGL2RenderingContext) {
@@ -50,7 +50,7 @@ class UniformIntro private constructor(
                 fun create(
                     program: Program,
                     vertexArray: VertexArray,
-                    uniforms: Map<String, Uniform<*>>,
+                    uniforms: Map<String, BasicUniform<*>>,
                     mode: GLenum
                 ): Shape {
                     return Shape(program, vertexArray, associateUniforms(program, uniforms), mode)
@@ -58,7 +58,7 @@ class UniformIntro private constructor(
 
                 private fun uploadData(
                     gl: WebGL2RenderingContext,
-                    uniformLocations: List<Pair<Uniform<*>, WebGLUniformLocation?>>
+                    uniformLocations: List<Pair<BasicUniform<*>, WebGLUniformLocation?>>
                 ) {
                     for ((uniform, location) in uniformLocations) {
                         uniform.uploadData(gl, location)
@@ -67,8 +67,8 @@ class UniformIntro private constructor(
 
                 private fun associateUniforms(
                     program: Program,
-                    uniforms: Map<String, Uniform<*>>
-                ): List<Pair<Uniform<*>, WebGLUniformLocation?>> =
+                    uniforms: Map<String, BasicUniform<*>>
+                ): List<Pair<BasicUniform<*>, WebGLUniformLocation?>> =
                     uniforms.map { (name, uniform) -> uniform to program.getUniform(name)!!.location }
             }
         }
@@ -128,7 +128,7 @@ class UniformIntro private constructor(
             val vertexArray = requireNotNull(gl.createVertexArray()) {
                 "Cannot create vertex array object"
             }
-            geometry.buildArray(gl, program)
+            geometry.buildVertexArray(gl, program)
             return VertexArray(vertexArray, geometry)
         }
     }

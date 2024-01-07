@@ -126,7 +126,7 @@ class ColorBuffer(
             val vertexArray = requireNotNull(gl.createVertexArray()) {
                 "Cannot create vertex array object"
             }
-            geometry.buildArray(gl, program)
+            geometry.buildVertexArray(gl, program)
             return VertexArray(vertexArray, geometry)
         }
     }

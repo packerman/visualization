@@ -1,8 +1,8 @@
 package framework.material
 
+import framework.core.BasicUniform
+import framework.core.BasicUniform.Companion.uniform
 import framework.core.Program
-import framework.core.Uniform
-import framework.core.Uniform.Companion.uniform
 import framework.math.Matrix4
 import web.gl.WebGL2RenderingContext
 import web.gl.WebGL2RenderingContext.Companion.CULL_FACE
@@ -17,17 +17,17 @@ interface Material {
 
 class MaterialImpl private constructor(
     override val program: Program,
-    private val uniforms: Map<String, Uniform<*>> = mapOf(),
+    private val uniforms: Map<String, BasicUniform<*>> = mapOf(),
     private val doubleSided: Boolean = false
 ) : Material {
 
     @Suppress("unchecked_cast")
-    override fun <T> getUniform(name: String): T = (uniforms.getValue(name) as Uniform<T>).data
+    override fun <T> getUniform(name: String): T = (uniforms.getValue(name) as BasicUniform<T>).data
 
     @Suppress("unchecked_cast")
     override fun <T> setUniform(name: String, data: T) {
         uniforms[name]?.let { uniform ->
-            (uniform as Uniform<T>).data = data
+            (uniform as BasicUniform<T>).data = data
         }
     }
 
@@ -56,11 +56,11 @@ class MaterialImpl private constructor(
             gl: WebGL2RenderingContext,
             vertexShaderSource: String,
             fragmentShaderSource: String,
-            uniforms: Map<String, Uniform<*>> = mapOf(),
+            uniforms: Map<String, BasicUniform<*>> = mapOf(),
             doubleSided: Boolean = false
         ): Material {
             val program = Program.build(gl, vertexShaderSource, fragmentShaderSource)
-            val allUniforms: MutableMap<String, Uniform<*>> = mutableMapOf(
+            val allUniforms: MutableMap<String, BasicUniform<*>> = mutableMapOf(
                 MODEL_MATRIX to uniform(Matrix4()),
                 VIEW_MATRIX to uniform(Matrix4()),
                 PROJECTION_MATRIX to uniform(Matrix4())

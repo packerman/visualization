@@ -1,7 +1,7 @@
 package examples.intro
 
 import framework.core.*
-import framework.core.Uniform.Companion.uniform
+import framework.core.BasicUniform.Companion.uniform
 import framework.geometry.Geometry
 import framework.geometry.geometry
 import framework.math.Vector3
@@ -17,7 +17,7 @@ import kotlin.math.sin
 class AnimationTime private constructor(
     private val program: Program,
     private val shapes: List<Shape>,
-    private val translation: Uniform<Vector3>
+    private val translation: BasicUniform<Vector3>
 ) : Application {
     override fun update(elapsed: Double, keyState: KeyState) {
         val time = Date.now().toFloat() / 1000f
@@ -41,7 +41,7 @@ class AnimationTime private constructor(
         private data class Shape(
             val program: Program,
             val vertexArray: VertexArray,
-            val uniforms: Map<String, Uniform<*>>,
+            val uniforms: Map<String, BasicUniform<*>>,
             val mode: GLenum
         ) {
             fun render(gl: WebGL2RenderingContext) {
@@ -106,11 +106,11 @@ class AnimationTime private constructor(
             val vertexArray = requireNotNull(gl.createVertexArray()) {
                 "Cannot create vertex array object"
             }
-            geometry.buildArray(gl, program)
+            geometry.buildVertexArray(gl, program)
             return VertexArray(vertexArray, geometry)
         }
 
-        private fun uploadData(gl: WebGL2RenderingContext, program: Program, uniforms: Map<String, Uniform<*>>) {
+        private fun uploadData(gl: WebGL2RenderingContext, program: Program, uniforms: Map<String, BasicUniform<*>>) {
             for ((name, uniform) in uniforms) {
                 program.getUniform(name)?.let { active ->
                     uniform.uploadData(gl, active.location)

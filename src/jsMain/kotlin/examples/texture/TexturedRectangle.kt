@@ -30,7 +30,7 @@ class TexturedRectangle private constructor(
             }
             val mesh = mesh(
                 gl, rectangleGeometry(), textureMaterial(
-                    loadTexture("textures/crate.png"),
+                    loadTexture("textures/bloc.jpg"),
                 )
             )
             val scene = Scene().apply {

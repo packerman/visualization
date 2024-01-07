@@ -31,7 +31,7 @@ class Geometry(
     private val index: Index?,
 ) {
 
-    fun buildArray(gl: WebGL2RenderingContext, program: Program) {
+    fun buildVertexArray(gl: WebGL2RenderingContext, program: Program) {
         for ((name, attribute) in attributes) {
             attribute.uploadData(gl)
             program.getAttribute(name)?.let { active ->
