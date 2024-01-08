@@ -21,7 +21,7 @@ class Mesh private constructor(
 
     var visible: Boolean = true
 
-    fun render(gl: WebGL2RenderingContext, camera: Camera) {
+    fun render(gl: WebGL2RenderingContext, camera: Camera, materialUpdater: ((Material) -> Unit)? = null) {
         if (!visible) return
         with(material) {
             program.use(gl)
@@ -29,6 +29,9 @@ class Mesh private constructor(
             setUniform(VIEW_MATRIX, camera.viewMatrix)
             setUniform(PROJECTION_MATRIX, camera.projectionMatrix)
             uploadData(gl)
+            if (materialUpdater != null) {
+                materialUpdater(material)
+            }
             updateRenderSettings(gl)
         }
         gl.bindVertexArray(vertexArray)

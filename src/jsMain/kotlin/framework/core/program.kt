@@ -16,6 +16,10 @@ class Program(
 
     fun getUniform(name: String): ActiveUniform? = uniforms[name]
 
+    fun getUniform(base: String, relative: String): ActiveUniform? = uniforms[joinName(base, relative)]
+
+    fun hasUniform(name: String): Boolean = name in uniforms
+
     companion object {
         data class ActiveAttribute(val location: GLint, val type: GLenum)
 
@@ -100,3 +104,5 @@ class Program(
         }
     }
 }
+
+private fun joinName(base: String, relative: String) = "$base.$relative"

@@ -2,7 +2,9 @@ package framework.material
 
 import framework.core.BasicUniform
 import framework.core.BasicUniform.Companion.uniform
+import framework.core.IntUniform
 import framework.core.Program
+import framework.core.UniformUpdater
 import framework.math.Matrix4
 import web.gl.WebGL2RenderingContext
 import web.gl.WebGL2RenderingContext.Companion.CULL_FACE
@@ -13,11 +15,13 @@ interface Material {
     fun <T> setUniform(name: String, data: T)
     fun uploadData(gl: WebGL2RenderingContext)
     fun updateRenderSettings(gl: WebGL2RenderingContext)
+    fun hasUniform(name: String): Boolean
+    fun <U : UniformUpdater> updateArray(gl: WebGL2RenderingContext, array: Array<U>, name: String, countName: String)
 }
 
 class MaterialImpl private constructor(
     override val program: Program,
-    private val uniforms: Map<String, BasicUniform<*>> = mapOf(),
+    private val uniforms: Map<String, UniformUpdater> = mapOf(),
     private val doubleSided: Boolean = false
 ) : Material {
 
@@ -33,9 +37,7 @@ class MaterialImpl private constructor(
 
     override fun uploadData(gl: WebGL2RenderingContext) {
         for ((name, uniform) in uniforms) {
-            program.getUniform(name)?.let { active ->
-                uniform.uploadData(gl, active.location)
-            }
+            uniform.updateData(gl, name, program)
         }
     }
 
@@ -44,6 +46,21 @@ class MaterialImpl private constructor(
             gl.disable(CULL_FACE)
         } else {
             gl.enable(CULL_FACE)
+        }
+    }
+
+    override fun hasUniform(name: String): Boolean = program.hasUniform(name)
+
+    override fun <U : UniformUpdater> updateArray(
+        gl: WebGL2RenderingContext,
+        array: Array<U>,
+        name: String,
+        countName: String
+    ) {
+        fun indexName(i: Int) = "$name[$i]"
+        IntUniform.uploadData(gl, program.getUniform(countName)?.location, array.size)
+        for (i in array.indices) {
+            array[i].updateData(gl, indexName(i), program)
         }
     }
 

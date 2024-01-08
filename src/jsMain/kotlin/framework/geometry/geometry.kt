@@ -55,7 +55,8 @@ class Geometry(
     companion object {
         const val POSITION = "a_position"
         const val COLOR_0 = "a_color_0"
-        const val TEXCOORD_0 = "a_texcoord_0";
+        const val TEXCOORD_0 = "a_texcoord_0"
+        const val NORMAL = "a_normal"
 
         operator fun invoke(attributes: Map<String, Attribute>, index: Index?): Geometry {
             val vertexCount = attributes.asSequence()

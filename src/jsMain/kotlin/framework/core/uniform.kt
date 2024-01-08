@@ -11,18 +11,20 @@ import web.gl.WebGL2RenderingContext.Companion.BOOL
 import web.gl.WebGL2RenderingContext.Companion.FLOAT_MAT4
 import web.gl.WebGL2RenderingContext.Companion.FLOAT_VEC2
 import web.gl.WebGL2RenderingContext.Companion.FLOAT_VEC3
+import web.gl.WebGL2RenderingContext.Companion.INT
 import web.gl.WebGL2RenderingContext.Companion.SAMPLER_2D
 import web.gl.WebGL2RenderingContext.Companion.TEXTURE_2D
 import web.gl.WebGLUniformLocation
 
-interface Uniform {
+interface UniformUpdater {
     fun updateData(gl: WebGL2RenderingContext, name: String, program: Program)
 }
 
-sealed class BasicUniform<T>(var data: T, val dataType: GLenum) : Uniform {
+sealed class BasicUniform<T>(var data: T, private val dataType: GLenum) : UniformUpdater {
 
     override fun updateData(gl: WebGL2RenderingContext, name: String, program: Program) {
         program.getUniform(name)?.let { active ->
+            check(dataType == active.type)
             uploadData(gl, active.location)
         }
     }
@@ -33,6 +35,8 @@ sealed class BasicUniform<T>(var data: T, val dataType: GLenum) : Uniform {
 
     companion object {
         fun uniform(data: Boolean): BasicUniform<Boolean> = BooleanUniform(data)
+
+        fun uniform(data: Int): BasicUniform<Int> = IntUniform(data)
 
         fun uniform(data: Vector2): BasicUniform<Vector2> = Vector2Uniform(data)
 
@@ -50,15 +54,33 @@ private class BooleanUniform(data: Boolean) : BasicUniform<Boolean>(data, BOOL) 
     }
 }
 
+class IntUniform(data: Int) : BasicUniform<Int>(data, INT) {
+    override fun uploadData(gl: WebGL2RenderingContext, location: WebGLUniformLocation?) {
+        uploadData(gl, location, data)
+    }
+
+    companion object {
+        fun uploadData(gl: WebGL2RenderingContext, location: WebGLUniformLocation?, data: Int) {
+            gl.uniform1i(location, data)
+        }
+    }
+}
+
 private class Vector2Uniform(data: Vector2) : BasicUniform<Vector2>(data, FLOAT_VEC2) {
     override fun uploadData(gl: WebGL2RenderingContext, location: WebGLUniformLocation?) {
         gl.uniform2f(location, data.x, data.y)
     }
 }
 
-private class Vector3Uniform(data: Vector3) : BasicUniform<Vector3>(data, FLOAT_VEC3) {
+class Vector3Uniform(data: Vector3) : BasicUniform<Vector3>(data, FLOAT_VEC3) {
     override fun uploadData(gl: WebGL2RenderingContext, location: WebGLUniformLocation?) {
-        gl.uniform3f(location, data.x, data.y, data.z)
+        uploadData(gl, location, data)
+    }
+
+    companion object {
+        fun uploadData(gl: WebGL2RenderingContext, location: WebGLUniformLocation?, data: Vector3) {
+            gl.uniform3f(location, data.x, data.y, data.z)
+        }
     }
 }
 
@@ -93,6 +115,10 @@ class UniformMapBuilder {
     private val uniforms = mutableMapOf<String, BasicUniform<*>>()
 
     fun uniform(name: String, value: Boolean) {
+        uniforms[name] = uniform(value)
+    }
+
+    fun uniform(name: String, value: Int) {
         uniforms[name] = uniform(value)
     }
 

@@ -31,6 +31,11 @@ data class Matrix4 internal constructor(val floats: FloatArray) {
         return result
     }
 
+    fun transpose(result: Matrix4): Matrix4 {
+        transpose(result.floats, floats)
+        return result
+    }
+
     inline fun forEachIndexed(action: (Int, Float) -> Unit) {
         floats.forEachIndexed(action)
     }

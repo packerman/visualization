@@ -2,6 +2,7 @@ package framework.geometry
 
 import framework.core.Supplier
 import framework.geometry.Geometry.Companion.COLOR_0
+import framework.geometry.Geometry.Companion.NORMAL
 import framework.geometry.Geometry.Companion.POSITION
 import framework.geometry.Geometry.Companion.TEXCOORD_0
 
@@ -52,6 +53,26 @@ fun boxGeometry(width: Float = 1f, height: Float = 1f, depth: Float = 1f): Suppl
                 add(t[0])
                 add(t[3])
                 add(t[2])
+            }
+        })
+        attribute(NORMAL, buildList {
+            repeat(6) {
+                add(arrayOf(1f, 0f, 0f))
+            }
+            repeat(6) {
+                add(arrayOf(-1f, 0f, 0f))
+            }
+            repeat(6) {
+                add(arrayOf(0f, 1f, 0f))
+            }
+            repeat(6) {
+                add(arrayOf(0f, -1f, 0f))
+            }
+            repeat(6) {
+                add(arrayOf(0f, 0f, 1f))
+            }
+            repeat(6) {
+                add(arrayOf(0f, 0f, -1f))
             }
         })
     }

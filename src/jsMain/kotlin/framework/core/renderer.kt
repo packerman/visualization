@@ -1,6 +1,8 @@
 package framework.core
 
+import framework.light.Light
 import framework.math.Vector3
+import js.core.toTypedArray
 import web.gl.WebGL2RenderingContext
 import web.gl.WebGL2RenderingContext.Companion.BLEND
 import web.gl.WebGL2RenderingContext.Companion.COLOR_BUFFER_BIT
@@ -17,11 +19,18 @@ class Renderer private constructor() {
         camera.aspectRatio = gl.drawingBufferWidth.toFloat() / gl.drawingBufferHeight.toFloat()
         camera.updateViewMatrix()
 
-        val descendants = scene.descendants
+        val descendants = scene.descendants.toList()
 
-        descendants.filterIsInstance<Mesh>().forEach { mesh ->
-            mesh.render(gl, camera)
-        }
+        val lights = descendants.asSequence()
+            .filterIsInstance<Light>()
+            .toTypedArray()
+
+        descendants.asSequence()
+            .filterIsInstance<Mesh>().forEach { mesh ->
+                mesh.render(gl, camera) { material ->
+                    material.updateArray(gl, lights, "lights", "lightCount")
+                }
+            }
     }
 
     companion object {
