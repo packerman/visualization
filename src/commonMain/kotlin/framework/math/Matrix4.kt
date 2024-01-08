@@ -84,5 +84,10 @@ data class Matrix4 internal constructor(val floats: FloatArray) {
             perspectiveNO(result.floats, angleOfView, aspectRatio, near, far)
             return result
         }
+
+        fun lookAt(result: Matrix4, eye: Vector3, center: Vector3, up: Vector3): Matrix4 {
+            lookAt(result.floats, eye.floats, center.floats, up.floats)
+            return result
+        }
     }
 }

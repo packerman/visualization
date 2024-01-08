@@ -32,6 +32,7 @@ class Light private constructor(
         when (type) {
             DIRECTIONAL -> {
                 Vector3Uniform.uploadData(gl, program.getUniform(name, "direction")?.location, direction)
+                console.log("Set $direction to $name ${program.getUniform(name, "direction")?.location}")
             }
 
             POINT -> {

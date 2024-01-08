@@ -34,6 +34,7 @@ interface Node {
     val worldPosition: Vector3
     val rotationMatrix: Matrix3
     var direction: Vector3
+    fun lookAt(target: Vector3)
     fun findByName(name: String): Node?
 }
 
@@ -115,7 +116,14 @@ class NodeImpl(override val name: String? = null) : Node {
 
     override var direction: Vector3
         get() = rotationMatrix * Vector3(0f, 0f, -1f)
-        set(value) {}
+        set(value) {
+            val target = position + value
+            lookAt(target)
+        }
+
+    override fun lookAt(target: Vector3) {
+        Matrix4.lookAt(transform, worldPosition, target, Vector3(0f, 1f, 0f))
+    }
 
     override fun findByName(name: String): Node? {
         if (this.name == name) {

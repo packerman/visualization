@@ -105,8 +105,8 @@ data class Vector3(internal val floats: FloatArray) {
         return floats.contentEquals(other.floats)
     }
 
-    override fun hashCode(): Int {
-        return floats.contentHashCode()
-    }
+    override fun hashCode(): Int = floats.contentHashCode()
+
+    override fun toString(): String = "Vector3($x, $y, $z)"
 }
 
