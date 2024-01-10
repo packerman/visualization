@@ -108,7 +108,6 @@ private class Sampler2DUniform(data: Sampler2D) : BasicUniform<Sampler2D>(data, 
         gl.bindTexture(TEXTURE_2D, data.texture)
         gl.uniform1i(location, data.textureUnit)
     }
-
 }
 
 class UniformMapBuilder {

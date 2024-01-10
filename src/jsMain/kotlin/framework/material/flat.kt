@@ -34,7 +34,7 @@ class FlatMaterial private constructor(private val material: Material) : Materia
             ${getGlslDeclarations()}
             
             struct Light {
-                int type;
+                int lightType;
                 vec3 color;
                 vec3 direction;
                 vec3 position;
@@ -62,16 +62,16 @@ class FlatMaterial private constructor(private val material: Material) : Materia
                 float attenuation = 1.0;
                 vec3 direction = vec3(0, 0, 0);
                 
-                if (light.type == AMBIENT) {
+                if (light.lightType == AMBIENT) {
                     ambient = 1.0;
-                } else if (light.type == DIRECTIONAL) {
-                    vec3 direction = normalize(light.direction);
-                } else if (light.type == POINT)  {
+                } else if (light.lightType == DIRECTIONAL) {
+                    direction = normalize(light.direction);
+                } else if (light.lightType == POINT)  {
                     direction = normalize(position - light.position);
                     float distance = length(light.position - position);
                     attenuation = attenuationCalc(light.attenuation, distance);
                 }
-                if (light.type != AMBIENT) {
+                if (light.lightType != AMBIENT) {
                     normal = normalize(normal);
                     diffuse = max(dot(normal, - direction), 0.0);
                     diffuse *= attenuation;

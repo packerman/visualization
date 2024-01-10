@@ -30,7 +30,7 @@ class Mesh private constructor(
             setUniform(PROJECTION_MATRIX, camera.projectionMatrix)
             uploadData(gl)
             if (materialUpdater != null) {
-                materialUpdater(material)
+                materialUpdater(this)
             }
             updateRenderSettings(gl)
         }

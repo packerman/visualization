@@ -150,6 +150,10 @@ enum class TransformType {
 
 class NodeBuilder(private val gl: WebGL2RenderingContext, private val built: Node) {
 
+    fun add(node: Node) {
+        built.add(node)
+    }
+
     fun mesh(
         geometry: Supplier<Geometry>,
         material: Supplier<Material>,
